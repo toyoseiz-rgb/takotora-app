@@ -1,57 +1,314 @@
-</html><!DOCTYPE html>
-      box.innerHTML = '集計失敗：' + e.message;
-    }
-  }
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>たこ虎 売上管理</title>
+<style>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #fff7fb;
+  color: #333;
+}
+header {
+  background: #ff5fa2;
+  color: white;
+  padding: 14px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+.container {
+  padding: 14px;
+}
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+input, select, button, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+button {
+  background: #ff5fa2;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+button.secondary {
+  background: #999;
+}
+.itemBtn {
+  width: auto;
+  margin: 4px;
+  display: inline-block;
+}
+.notice {
+  background: #ffe6f0;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #ffd3e6;
+}
+</style>
+</head>
+<body>
+<header>たこ虎 売上管理</header>
 
-  function tableHtml(headers, rows) {
-    if (!rows.length) return '<div class="notice small">データなし</div>';
-    return `
+<div class="container">
+
+<div class="card">
+<h3>売上入力</h3>
+
+<label>日付</label>
+<input type="date" id="saleDate" />
+
+<label>現場</label>
+<select id="siteSelect"></select>
+
+<div class="notice">
+天気場所：<span id="weatherPlace">-</span><br>
+天気：<span id="weatherText">取得中...</span>
+</div>
+
+<label>品目追加</label>
+<div id="itemButtons"></div>
+
+<div id="saleItems"></div>
+
+<label>メモ</label>
+<textarea id="memo"></textarea>
+
+<button onclick="saveSale()">保存</button>
+<button class="secondary" onclick="location.reload()">戻る</button>
+</div>
+
+<div class="card">
+<h3>年間売上</h3>
+<button onclick="loadAnnual()">年間集計を見る</button>
+<div id="annualBox"></div>
+</div>
+
+<div class="card">
+<h3>前年・一昨年比較</h3>
+<button onclick="loadHistory()">同現場比較</button>
+<div id="historyBox"></div>
+</div>
+
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbzNHU8NG8B0Uq0_LcN4rpEi2-wqm-Y3LZpyxIeKQ-SIHGBFTjKGaKsvPOctGTFq4nFuMg/exec';
+const PIN = '2931';
+
+let masters = { sites: [], items: [] };
+let saleItems = [];
+
+async function jsonp(params = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+    params.callback = callbackName;
+
+    const query = new URLSearchParams(params).toString();
+    const script = document.createElement('script');
+
+    window[callbackName] = (data) => {
+      delete window[callbackName];
+      script.remove();
+      if (data.ok === false) {
+        reject(new Error(data.error || 'エラー'));
+      } else {
+        resolve(data);
+      }
+    };
+
+    script.onerror = () => reject(new Error('通信失敗'));
+    script.src = API + '?' + query;
+    document.body.appendChild(script);
+  });
+}
+
+async function init() {
+  document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+
+  const res = await jsonp({ action: 'masters', pin: PIN });
+  masters = res;
+
+  const siteSelect = document.getElementById('siteSelect');
+  siteSelect.innerHTML = masters.sites.map(s =>
+    `<option value="${s['現場名']}">${s['現場名']}</option>`
+  ).join('');
+
+  const itemButtons = document.getElementById('itemButtons');
+  itemButtons.innerHTML = masters.items.map(i =>
+    `<button class="itemBtn" onclick="addItem('${i['品目名']}', ${i['標準単価'] || 0})">${i['品目名']}</button>`
+  ).join('');
+
+  siteSelect.addEventListener('change', updateWeather);
+  updateWeather();
+}
+
+async function updateWeather() {
+  const site = document.getElementById('siteSelect').value;
+  const found = masters.sites.find(s => s['現場名'] === site);
+
+  const place = found ? found['天気場所'] : '';
+  document.getElementById('weatherPlace').innerText = place;
+
+  try {
+    const url = `https://wttr.in/${encodeURIComponent(place)}?format=3`;
+    const text = await fetch(url).then(r => r.text());
+    document.getElementById('weatherText').innerText = text;
+  } catch(e) {
+    document.getElementById('weatherText').innerText = '取得失敗';
+  }
+}
+
+function addItem(name, price) {
+  saleItems.push({ name, qty: 1, price, amount: price });
+  renderItems();
+}
+
+function renderItems() {
+  const box = document.getElementById('saleItems');
+
+  box.innerHTML = saleItems.map((i, idx) => `
+    <div class="card">
+      <b>${i.name}</b><br>
+      数量
+      <input type="number" value="${i.qty}" onchange="changeQty(${idx}, this.value)">
+      単価
+      <input type="number" value="${i.price}" onchange="changePrice(${idx}, this.value)">
+      売上：${Number(i.amount).toLocaleString()}円
+      <button class="secondary" onclick="removeItem(${idx})">削除</button>
+    </div>
+  `).join('');
+}
+
+function changeQty(idx, value) {
+  saleItems[idx].qty = Number(value || 0);
+  saleItems[idx].amount = saleItems[idx].qty * saleItems[idx].price;
+  renderItems();
+}
+
+function changePrice(idx, value) {
+  saleItems[idx].price = Number(value || 0);
+  saleItems[idx].amount = saleItems[idx].qty * saleItems[idx].price;
+  renderItems();
+}
+
+function removeItem(idx) {
+  saleItems.splice(idx, 1);
+  renderItems();
+}
+
+async function saveSale() {
+  try {
+    const site = document.getElementById('siteSelect').value;
+    const found = masters.sites.find(s => s['現場名'] === site);
+
+    const payload = {
+      date: document.getElementById('saleDate').value,
+      site,
+      weatherPlace: found ? found['天気場所'] : '',
+      weather: document.getElementById('weatherText').innerText,
+      memo: document.getElementById('memo').value,
+      items: saleItems
+    };
+
+    const res = await jsonp({
+      action: 'saveSale',
+      pin: PIN,
+      payload: JSON.stringify(payload)
+    });
+
+    alert('保存しました 合計：' + Number(res.total).toLocaleString() + '円');
+    saleItems = [];
+    renderItems();
+    document.getElementById('memo').value = '';
+
+  } catch(e) {
+    alert('保存失敗：' + e.message);
+  }
+}
+
+async function loadAnnual() {
+  const box = document.getElementById('annualBox');
+  box.innerHTML = '読込中...';
+
+  try {
+    const year = new Date().getFullYear();
+    const res = await jsonp({ action: 'annual', pin: PIN, year });
+
+    box.innerHTML = `
+      <div class="notice">
+      年間売上：${Number(res.total).toLocaleString()}円<br>
+      前年比：${Number(res.diffPrev).toLocaleString()}円
+      </div>
       <table>
-        <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-        <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+        <tr><th>月</th><th>売上</th></tr>
+        ${res.monthly.map(m => `
+          <tr>
+            <td>${m.month}月</td>
+            <td>${Number(m.amount).toLocaleString()}円</td>
+          </tr>
+        `).join('')}
       </table>
     `;
+  } catch(e) {
+    box.innerHTML = '集計失敗：' + e.message;
   }
+}
 
-  function renderMasters() {
-    document.getElementById('siteList').innerHTML = masters.sites.map(s => {
-      return `<span class="pill">${s['現場名']}：${s['天気場所'] || ''}</span>`;
-    }).join('');
+async function loadHistory() {
+  const box = document.getElementById('historyBox');
+  box.innerHTML = '読込中...';
 
-    document.getElementById('itemList').innerHTML = masters.items.map(i => {
-      return `<span class="pill">${i['品目名']}：${yen(i['標準単価'])}円</span>`;
-    }).join('');
+  try {
+    const year = new Date().getFullYear();
+    const site = document.getElementById('siteSelect').value;
+
+    const res = await jsonp({
+      action: 'history',
+      pin: PIN,
+      year,
+      site
+    });
+
+    box.innerHTML = res.history.map(h => `
+      <div class="card">
+        <b>${h.year}年 ${h.site}</b><br>
+        売上：${Number(h.total).toLocaleString()}円
+      </div>
+    `).join('');
+
+  } catch(e) {
+    box.innerHTML = '比較失敗：' + e.message;
   }
+}
 
-  async function addSite() {
-    const name = document.getElementById('newSiteName').value.trim();
-    const weatherPlace = document.getElementById('newSiteWeather').value.trim();
-    if (!name) return alert('現場名を入れてください');
-    try {
-      await jsonp({ action: 'addSite', pin: PIN, name, weatherPlace });
-      document.getElementById('newSiteName').value = '';
-      document.getElementById('newSiteWeather').value = '';
-      await reloadMasters();
-      alert('現場を追加しました');
-    } catch (e) {
-      alert(e.message);
-    }
-  }
-
-  async function addItem() {
-    const name = document.getElementById('newItemName').value.trim();
-    const price = document.getElementById('newItemPrice').value.trim();
-    if (!name) return alert('品目名を入れてください');
-    try {
-      await jsonp({ action: 'addItem', pin: PIN, name, price });
-      document.getElementById('newItemName').value = '';
-      document.getElementById('newItemPrice').value = '';
-      await reloadMasters();
-      alert('品目を追加しました');
-    } catch (e) {
-      alert(e.message);
-    }
-  }
+init();
 </script>
 </body>
 </html>
