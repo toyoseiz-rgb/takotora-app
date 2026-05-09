@@ -175,14 +175,63 @@ async function updateWeather() {
 
   const place = found ? found['天気場所'] : '';
   document.getElementById('weatherPlace').innerText = place;
+  document.getElementById('weatherText').innerText = '取得中...';
+
+  if (!place) {
+    document.getElementById('weatherText').innerText = '天気場所なし';
+    return;
+  }
 
   try {
-    const url = `https://wttr.in/${encodeURIComponent(place)}?format=3`;
-    const text = await fetch(url).then(r => r.text());
-    document.getElementById('weatherText').innerText = text;
+    const geoUrl = 'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(place) + '&count=1&language=ja&format=json';
+    const geo = await fetch(geoUrl).then(r => r.json());
+
+    if (!geo.results || !geo.results.length) {
+      document.getElementById('weatherText').innerText = '場所が見つかりません';
+      return;
+    }
+
+    const loc = geo.results[0];
+    const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + loc.latitude + '&longitude=' + loc.longitude + '&current_weather=true&timezone=Asia%2FTokyo';
+    const data = await fetch(weatherUrl).then(r => r.json());
+
+    if (!data.current_weather) {
+      document.getElementById('weatherText').innerText = '天気取得不可';
+      return;
+    }
+
+    const w = data.current_weather;
+    document.getElementById('weatherText').innerText = weatherCodeText(w.weathercode) + ' / ' + w.temperature + '℃ / 風速' + w.windspeed + 'm';
   } catch(e) {
     document.getElementById('weatherText').innerText = '取得失敗';
   }
+}
+
+function weatherCodeText(code) {
+  const map = {
+    0: '快晴',
+    1: '晴れ',
+    2: '一部くもり',
+    3: 'くもり',
+    45: '霧',
+    48: '霧氷',
+    51: '小雨',
+    53: '小雨',
+    55: '強い小雨',
+    61: '雨',
+    63: '雨',
+    65: '強い雨',
+    71: '雪',
+    73: '雪',
+    75: '強い雪',
+    80: 'にわか雨',
+    81: 'にわか雨',
+    82: '強いにわか雨',
+    95: '雷雨',
+    96: '雷雨・ひょう',
+    99: '強い雷雨・ひょう'
+  };
+  return map[code] || '天気コード' + code;
 }
 
 function addItem(name, price) {
