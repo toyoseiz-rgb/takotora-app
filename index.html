@@ -3,286 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <title>たこ虎 売上管理</title>
-
 <meta name="theme-color" content="#ffd000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="たこ虎">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=10">
 
 <style>
-
-:root{
-  --yellow:#ffd000;
-  --gold:#b88600;
-  --black:#111;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:#111;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  color:#111;
-}
-
-.header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:linear-gradient(#ffe45c,#ffd000);
-  border-bottom:6px solid var(--gold);
-  padding:16px;
-  text-align:center;
-}
-
-.header h1{
-  margin:0;
-  font-size:30px;
-  font-weight:900;
-}
-
-.wrap{
-  max-width:560px;
-  margin:auto;
-  padding:16px;
-}
-
-.card{
-  background:#fff;
-  border-radius:28px;
-  padding:20px;
-  margin:14px 0 22px;
-  box-shadow:0 4px 18px rgba(0,0,0,.25);
-}
-
-.logo{
-  width:140px;
-  height:140px;
-  display:block;
-  margin:14px auto;
-  border-radius:32px;
-}
-
-.lockTitle{
-  font-size:42px;
-  font-weight:900;
-  text-align:center;
-  line-height:1.12;
-}
-
-.sub{
-  text-align:center;
-  font-size:20px;
-  font-weight:800;
-  color:#666;
-  margin:12px 0;
-}
-
-label{
-  display:block;
-  font-size:20px;
-  font-weight:900;
-  margin:15px 0 8px;
-}
-
-input,
-select,
-textarea{
-  width:100%;
-  padding:15px;
-  font-size:21px;
-  border-radius:17px;
-  border:2px solid #ddd;
-  background:#fff;
-}
-
-textarea{
-  height:82px;
-}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.btn{
-  width:100%;
-  padding:18px;
-  border:none;
-  border-radius:22px;
-  background:var(--yellow);
-  font-size:29px;
-  font-weight:900;
-  box-shadow:0 7px var(--gold);
-  margin-top:18px;
-}
-
-.tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:8px;
-  margin:12px 0;
-}
-
-.tab{
-  background:#fff;
-  border:none;
-  border-radius:16px;
-  padding:13px 6px;
-  font-size:18px;
-  font-weight:900;
-  box-shadow:0 4px #aaa;
-}
-
-.tab.active{
-  background:var(--yellow);
-  box-shadow:0 4px var(--gold);
-}
-
-.hidden{
-  display:none!important;
-}
-
-.notice{
-  font-size:15px;
-  background:#fff7c7;
-  border:2px solid #ffd000;
-  border-radius:14px;
-  padding:10px;
-  margin:10px 0;
-  font-weight:900;
-}
-
-.itemBtns{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:8px;
-}
-
-.itemBtn,
-.linkBtn{
-  border:none;
-  background:#111;
-  color:#ffd000;
-  border-radius:14px;
-  padding:12px;
-  font-size:17px;
-  font-weight:900;
-  margin:3px;
-}
-
-.status{
-  text-align:center;
-  font-size:28px;
-  font-weight:900;
-  margin-top:14px;
-}
-
-.fold{
-  background:#fff;
-  border:2px solid #eee;
-  border-radius:18px;
-  padding:12px;
-  margin:10px 0;
-}
-
-.foldHead{
-  font-size:18px;
-  font-weight:900;
-  cursor:pointer;
-  list-style:none;
-}
-
-.foldHead::-webkit-details-marker{
-  display:none;
-}
-
-.foldBody{
-  margin-top:10px;
-  border-top:1px solid #eee;
-  padding-top:10px;
-}
-
-.line{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  padding:5px 0;
-  font-size:16px;
-}
-
-.leftLine{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.itemName{
-  min-width:90px;
-  font-weight:700;
-}
-
-.line b{
-  font-size:18px;
-}
-
-.summary{
-  font-size:22px;
-  font-weight:900;
-  line-height:1.65;
-  margin-bottom:12px;
-}
-
-hr{
-  border:none;
-  border-top:1px solid #eee;
-  margin:10px 0;
-}
-
+:root{--yellow:#ffd000;--gold:#b88600;--black:#111}
+*{box-sizing:border-box}
+body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#111}
+.header{position:sticky;top:0;z-index:50;background:linear-gradient(#ffe45c,#ffd000);border-bottom:6px solid var(--gold);padding:16px;text-align:center}
+.header h1{margin:0;font-size:30px;font-weight:900}
+.wrap{max-width:560px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:28px;padding:20px;margin:14px 0 22px;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.logo{width:140px;height:140px;display:block;margin:14px auto;border-radius:32px}
+.lockTitle{font-size:42px;font-weight:900;text-align:center;line-height:1.12}
+.sub{text-align:center;font-size:20px;font-weight:800;color:#666;margin:12px 0}
+label{display:block;font-size:20px;font-weight:900;margin:15px 0 8px}
+input,select,textarea{width:100%;padding:15px;font-size:21px;border-radius:17px;border:2px solid #ddd;background:#fff}
+textarea{height:82px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:18px;border:none;border-radius:22px;background:var(--yellow);font-size:29px;font-weight:900;box-shadow:0 7px var(--gold);margin-top:18px}
+.btnMini{padding:11px 12px;border:none;border-radius:14px;background:var(--yellow);font-size:18px;font-weight:900;box-shadow:0 4px var(--gold);margin-top:10px}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.tab{background:#fff;border:none;border-radius:16px;padding:13px 6px;font-size:18px;font-weight:900;box-shadow:0 4px #aaa}
+.tab.active{background:var(--yellow);box-shadow:0 4px var(--gold)}
+.hidden{display:none!important}
+.notice{font-size:15px;background:#fff7c7;border:2px solid #ffd000;border-radius:14px;padding:10px;margin:10px 0;font-weight:900}
+.itemBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.itemBtn,.linkBtn{border:none;background:#111;color:#ffd000;border-radius:14px;padding:12px;font-size:17px;font-weight:900;margin:3px}
+.status{text-align:center;font-size:28px;font-weight:900;margin-top:14px}
+.addedBox{border:2px solid #eee;border-radius:16px;padding:10px;margin:12px 0;background:#fafafa}
+.addedRow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;border-bottom:1px solid #ddd;padding:8px 0;font-size:17px;font-weight:800}
+.addedRow:last-child{border-bottom:none}
+.delBtn{border:none;border-radius:10px;background:#111;color:#ffd000;font-weight:900;padding:8px 10px}
+.fold{background:#fff;border:2px solid #eee;border-radius:18px;padding:12px;margin:10px 0}
+.foldHead{font-size:18px;font-weight:900;cursor:pointer;list-style:none}
+.foldHead::-webkit-details-marker{display:none}
+.foldBody{margin-top:10px;border-top:1px solid #eee;padding-top:10px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:16px}
+.leftLine{display:flex;align-items:center;gap:10px;min-width:0}
+.itemName{display:inline-block;min-width:82px;font-weight:800}
+.line b{font-size:18px;white-space:nowrap}
+.summary{font-size:22px;font-weight:900;line-height:1.65;margin-bottom:12px}
+.expenseLine{font-size:16px;font-weight:900;padding-top:8px}
+hr{border:none;border-top:1px solid #eee;margin:10px 0}
 </style>
 </head>
 
 <body>
-
-<div class="header">
-  <h1>たこ虎 売上管理</h1>
-</div>
+<div class="header"><h1>たこ虎 売上管理</h1></div>
 
 <div class="wrap">
 
 <section id="lockScreen" class="card">
-
   <img src="icon.png.png?v=20" class="logo">
-
-  <div class="lockTitle">
-    たこ虎 売上管理
-  </div>
-
-  <div class="sub">
-    暗証番号を入力
-  </div>
-
-  <input
-    type="password"
-    id="pinInput"
-    inputmode="numeric"
-    maxlength="4"
-    placeholder="＊＊＊＊"
-  >
-
-  <button class="btn" onclick="unlock()">
-    開く
-  </button>
-
+  <div class="lockTitle">たこ虎 売上管理</div>
+  <div class="sub">暗証番号を入力</div>
+  <input type="password" id="pinInput" inputmode="numeric" maxlength="4" placeholder="＊＊＊＊">
+  <button class="btn" onclick="unlock()">開く</button>
 </section>
 
 <section id="mainScreen" class="hidden">
@@ -294,7 +75,6 @@ hr{
   </div>
 
   <section id="inputScreen">
-
     <div class="card">
 
       <label>日付</label>
@@ -307,105 +87,74 @@ hr{
       <div id="recentItems" class="notice hidden"></div>
 
       <div class="row">
-
         <div>
           <label>天気</label>
           <input type="text" id="weather" readonly>
         </div>
-
         <div>
           <label>風</label>
           <input type="text" id="wind" readonly>
         </div>
-
       </div>
 
       <label>品目</label>
-
       <input type="text" id="item" list="itemList" placeholder="例：やきとり">
-
       <datalist id="itemList"></datalist>
 
       <div id="itemButtons" class="itemBtns"></div>
 
       <div class="row">
-
         <div>
           <label>売上</label>
           <input type="number" id="sales">
         </div>
-
         <div>
-          <label>本数</label>
-          <input type="number" id="count">
+          <label>担当</label>
+          <input type="text" id="staff">
         </div>
-
       </div>
 
-      <label>担当</label>
-      <input type="text" id="staff">
+      <button class="btnMini" onclick="addItem()">品目を追加</button>
+
+      <div id="addedItems" class="addedBox hidden"></div>
 
       <div class="row">
-
         <div>
           <label>経費単価</label>
           <input type="number" id="costUnit">
         </div>
-
         <div>
-          <label>返し</label>
-          <input type="number" id="back">
+          <label>本数</label>
+          <input type="number" id="count">
         </div>
-
       </div>
+
+      <label>返し</label>
+      <input type="number" id="back">
 
       <label>メモ</label>
       <textarea id="memo"></textarea>
 
-      <button class="btn" onclick="saveData()">
-        保存する
-      </button>
-
+      <button class="btn" onclick="saveData()">保存する</button>
       <div class="status" id="result"></div>
 
     </div>
-
   </section>
 
   <section id="dailyScreen" class="hidden">
-
     <div class="card">
-
-      <div class="notice">
-        日別は確認専用。最新が上、直近だけ開きます。
-      </div>
-
-      <div id="dailyArea">
-        読み込み中...
-      </div>
-
+      <div class="notice">日別は確認専用。最新が上、直近だけ開きます。</div>
+      <div id="dailyArea">読み込み中...</div>
     </div>
-
   </section>
 
   <section id="yearlyScreen" class="hidden">
-
     <div class="card">
-
       <label>表示年</label>
-
       <select id="yearSelect" onchange="renderYearly()"></select>
-
-      <div class="notice">
-        年間は確認専用。1月から12月順、当月だけ開きます。
-      </div>
-
-      <div id="yearlyArea">
-        読み込み中...
-      </div>
-
+      <div class="notice">年間は確認専用。1月から12月順、当月だけ開きます。</div>
+      <div id="yearlyArea">読み込み中...</div>
     </div>
-
   </section>
 
 </section>
@@ -413,84 +162,59 @@ hr{
 </div>
 
 <script>
-
 const API_URL = "https://script.google.com/macros/s/AKfycbzNHU8NG8B0Uq0_LcN4rpEi2-wqm-Y3LZpyxIeKQ-SIHGBFTjKGaKsvPOctGTFq4nFuMg/exec";
-
 const PIN = "2931";
 
 let allRows = [];
 let placeMasters = [];
 let itemMasters = [];
+let topItems = [];
+let entryItems = [];
 
-document.getElementById("date").value =
-  new Date().toISOString().slice(0,10);
+document.getElementById("date").value = new Date().toISOString().slice(0,10);
 
-document.getElementById("pinInput").addEventListener("keydown", e=>{
-  if(e.key === "Enter"){
-    unlock();
-  }
+document.getElementById("pinInput").addEventListener("keydown", e => {
+  if(e.key === "Enter") unlock();
 });
 
-document.getElementById("place").addEventListener("change", ()=>{
+document.getElementById("place").addEventListener("input", () => {
+  showRecentItems();
+});
+
+document.getElementById("place").addEventListener("change", () => {
   showRecentItems();
   updateWeather();
 });
 
-if(localStorage.getItem("takotoraUnlock")==="1"){
+if(localStorage.getItem("takotoraUnlock") === "1"){
   showMain();
 }
 
 function unlock(){
-
   if(document.getElementById("pinInput").value.trim() === PIN){
-
     localStorage.setItem("takotoraUnlock","1");
-
     showMain();
-
   }else{
-
     alert("暗証番号が違います");
-
   }
-
 }
 
 function showMain(){
-
-  document.getElementById("lockScreen").style.display="none";
-
+  document.getElementById("lockScreen").style.display = "none";
   document.getElementById("mainScreen").classList.remove("hidden");
-
   refreshAll();
-
 }
 
 function showScreen(name){
-
-  ["input","daily","yearly"].forEach(n=>{
-
-    document.getElementById(n+"Screen")
-      .classList.toggle("hidden", n !== name);
-
-    document.getElementById("tab"+cap(n))
-      .classList.toggle("active", n === name);
-
+  ["input","daily","yearly"].forEach(n => {
+    document.getElementById(n+"Screen").classList.toggle("hidden", n !== name);
+    document.getElementById("tab"+cap(n)).classList.toggle("active", n === name);
   });
 
-  if(name==="daily"){
-    renderDaily();
-  }
+  if(name === "daily") renderDaily();
+  if(name === "yearly") renderYearly();
 
-  if(name==="yearly"){
-    renderYearly();
-  }
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function cap(s){
@@ -498,283 +222,243 @@ function cap(s){
 }
 
 function jsonp(url){
-
-  return new Promise((resolve,reject)=>{
-
-    const cb =
-      "cb_" +
-      Date.now() +
-      "_" +
-      Math.floor(Math.random()*9999);
+  return new Promise((resolve,reject) => {
+    const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*9999);
 
     window[cb] = data => {
-
       delete window[cb];
-
       script.remove();
-
       resolve(data);
-
     };
 
     const script = document.createElement("script");
-
-    script.src =
-      url +
-      (url.includes("?") ? "&" : "?") +
-      "callback=" +
-      cb;
-
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
     script.onerror = reject;
-
     document.body.appendChild(script);
-
   });
-
 }
 
 async function refreshAll(){
-
   try{
-
-    const data =
-      await jsonp(API_URL + "?action=list");
+    const data = await jsonp(API_URL + "?action=list");
 
     if(data && data.ok){
-
       allRows = data.sales || [];
       placeMasters = data.places || [];
       itemMasters = data.items || [];
+      topItems = data.topItems || itemMasters.slice(0,10);
 
       setupMasters();
-
       setupYears();
-
       renderDaily();
-
       renderYearly();
-
+      showRecentItems();
     }
-
   }catch(e){
-
     console.log(e);
-
   }
-
 }
 
 function setupMasters(){
-
   document.getElementById("placeList").innerHTML =
-    placeMasters.map(p =>
-      `<option value="${escapeHtml(p["現場名"])}">`
-    ).join("");
+    placeMasters.map(p => `<option value="${escapeHtml(p["現場名"])}">`).join("");
 
   document.getElementById("itemList").innerHTML =
-    itemMasters.map(i =>
-      `<option value="${escapeHtml(i["品目"])}">`
-    ).join("");
+    itemMasters.map(i => `<option value="${escapeHtml(i["品目"])}">`).join("");
 
   document.getElementById("itemButtons").innerHTML =
-    itemMasters.map(i =>
+    topItems.slice(0,10).map(i =>
       `<button class="itemBtn" onclick="setItem('${escapeAttr(i["品目"])}')">${escapeHtml(i["品目"])}</button>`
     ).join("");
-
 }
 
 function setItem(name){
-
   document.getElementById("item").value = name;
-
 }
 
-function showRecentItems(){
+function addItem(){
+  const name = val("item").trim();
+  const sales = Number(val("sales") || 0);
+  const staff = val("staff").trim();
 
-  const place =
-    document.getElementById("place").value.trim();
-
-  const box =
-    document.getElementById("recentItems");
-
-  if(!place){
-
-    box.classList.add("hidden");
-
+  if(!name){
+    alert("品目を入れてください");
     return;
-
   }
 
-  const rows =
-    allRows
-      .filter(r => r.place === place)
-      .sort((a,b)=>
-        String(b.date).localeCompare(String(a.date))
-      );
+  entryItems.push({
+    name: name,
+    sales: sales,
+    staff: staff
+  });
 
-  if(!rows.length){
+  document.getElementById("item").value = "";
+  document.getElementById("sales").value = "";
+  document.getElementById("staff").value = "";
 
+  renderEntryItems();
+}
+
+function renderEntryItems(){
+  const box = document.getElementById("addedItems");
+
+  if(!entryItems.length){
     box.classList.add("hidden");
-
+    box.innerHTML = "";
     return;
-
-  }
-
-  const latestDate = rows[0].date;
-
-  const items = [
-    ...new Set(
-      rows
-        .filter(r => r.date === latestDate)
-        .map(r => r.item)
-        .filter(Boolean)
-    )
-  ];
-
-  if(!items.length){
-
-    box.classList.add("hidden");
-
-    return;
-
   }
 
   box.classList.remove("hidden");
 
-  box.innerHTML =
-    "直近の品目候補<br>" +
-    items.map(i =>
-      `<button class="linkBtn" onclick="setItem('${escapeAttr(i)}')">${escapeHtml(i)}</button>`
-    ).join("");
-
+  box.innerHTML = entryItems.map((it,i) => `
+    <div class="addedRow">
+      <div>${escapeHtml(it.name)}　${escapeHtml(it.staff || "")}</div>
+      <b>${yen(it.sales)}</b>
+      <button class="delBtn" onclick="removeItem(${i})">削除</button>
+    </div>
+  `).join("");
 }
 
-function updateWeather(){
+function removeItem(i){
+  entryItems.splice(i,1);
+  renderEntryItems();
+}
 
-  const place =
-    document.getElementById("place").value.trim();
+function showRecentItems(){
+  const place = document.getElementById("place").value.trim();
+  const box = document.getElementById("recentItems");
 
-  if(!place) return;
+  if(!place){
+    box.classList.add("hidden");
+    return;
+  }
 
-  fetch("https://wttr.in/" + encodeURIComponent(place) + "?format=j1")
-    .then(r => r.json())
-    .then(data => {
+  const rows = allRows
+    .filter(r => r.place === place)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
 
-      const current =
-        data.current_condition[0];
+  if(!rows.length){
+    box.classList.add("hidden");
+    return;
+  }
 
-      const text =
-        current.weatherDesc[0].value;
+  const latestDate = rows[0].date;
 
-      const wind =
-        Number(current.windspeedKmph || 0);
+  const items = [...new Set(
+    rows
+      .filter(r => r.date === latestDate)
+      .map(r => r.item)
+      .filter(Boolean)
+  )];
 
-      let weather = "晴";
+  if(!items.length){
+    box.classList.add("hidden");
+    return;
+  }
 
-      if(text.includes("雨")) weather = "雨";
-      if(text.includes("曇")) weather = "曇";
+  box.classList.remove("hidden");
+  box.innerHTML = "直近の品目候補<br>" +
+    items.map(i => `<button class="linkBtn" onclick="setItem('${escapeAttr(i)}')">${escapeHtml(i)}</button>`).join("");
+}
 
-      if(text.includes("小雨")) weather = "小雨";
+function getWeatherLocation(){
+  const place = val("place").trim();
 
-      if(text.includes("大雨")) weather = "大雨";
+  const master = placeMasters.find(p => p["現場名"] === place);
 
-      if(text.includes("雷")) weather = "台風";
+  return master ? String(master["天気場所"] || place) : place;
+}
 
-      let windText = "";
+async function updateWeather(){
+  const location = getWeatherLocation();
 
-      if(wind >= 15){
-        windText = "強風";
-      }else if(wind >= 5){
-        windText = "風あり";
-      }
+  if(!location) return;
 
-      document.getElementById("weather").value =
-        weather;
+  try{
+    const res = await fetch("https://wttr.in/" + encodeURIComponent(location) + "?format=j1");
+    const data = await res.json();
 
-      document.getElementById("wind").value =
-        windText;
+    const current = data.current_condition[0];
+    const text = current.weatherDesc[0].value;
+    const windKmph = Number(current.windspeedKmph || 0);
 
-    });
+    document.getElementById("weather").value = normalizeWeather(text);
+    document.getElementById("wind").value = normalizeWind(windKmph);
 
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function normalizeWeather(text){
+  const t = String(text || "");
+
+  if(t.includes("typhoon") || t.includes("storm") || t.includes("雷")) return "台風";
+  if(t.includes("Heavy") || t.includes("大雨")) return "大雨";
+  if(t.includes("Light") || t.includes("小雨")) return "小雨";
+  if(t.includes("rain") || t.includes("Rain") || t.includes("雨")) return "雨";
+  if(t.includes("cloud") || t.includes("Cloud") || t.includes("Overcast") || t.includes("曇")) return "曇";
+
+  return "晴";
+}
+
+function normalizeWind(kmph){
+  const n = Number(kmph || 0);
+
+  if(n >= 15) return "強風";
+  if(n >= 5) return "風あり";
+
+  return "";
 }
 
 async function saveData(){
+  if(!entryItems.length){
+    addItem();
+  }
 
-  const costUnit =
-    Number(val("costUnit") || 0);
+  if(!entryItems.length){
+    return;
+  }
 
-  const count =
-    Number(val("count") || 0);
-
-  const costTotal =
-    costUnit * count;
+  const costUnit = Number(val("costUnit") || 0);
+  const count = Number(val("count") || 0);
+  const costTotal = costUnit * count;
 
   const data = {
-
     date: val("date"),
-
     place: val("place"),
-
-    weatherLocation:
-      (
-        placeMasters.find(p =>
-          p["現場名"] === val("place")
-        ) || {}
-      )["天気場所"] || "",
-
+    weatherLocation: getWeatherLocation(),
     weather: val("weather"),
-
     wind: val("wind"),
-
-    item: val("item"),
-
-    sales: Number(val("sales") || 0),
-
-    count: count,
-
-    staff: val("staff"),
-
+    items: entryItems,
     costUnit: costUnit,
-
+    count: count,
     costTotal: costTotal,
-
     back: Number(val("back") || 0),
-
     memo: val("memo")
-
   };
 
-  document.getElementById("result").innerText =
-    "保存中...";
+  document.getElementById("result").innerText = "保存中...";
 
   try{
-
     await fetch(API_URL, {
-
       method:"POST",
       mode:"no-cors",
       body: JSON.stringify(data)
-
     });
 
-    document.getElementById("result").innerText =
-      "保存完了";
+    document.getElementById("result").innerText = "保存完了";
 
     clearForm();
 
     setTimeout(refreshAll,900);
 
   }catch(e){
-
-    document.getElementById("result").innerText =
-      "保存失敗";
-
+    document.getElementById("result").innerText = "保存失敗";
   }
-
 }
 
 function clearForm(){
-
   [
     "date",
     "place",
@@ -782,157 +466,90 @@ function clearForm(){
     "wind",
     "item",
     "sales",
-    "count",
     "staff",
     "costUnit",
+    "count",
     "back",
     "memo"
-  ].forEach(id=>{
-
+  ].forEach(id => {
     document.getElementById(id).value = "";
-
   });
 
-  document.getElementById("recentItems")
-    .classList.add("hidden");
+  document.getElementById("date").value = new Date().toISOString().slice(0,10);
 
+  entryItems = [];
+  renderEntryItems();
+
+  document.getElementById("recentItems").classList.add("hidden");
 }
 
 function val(id){
-
   return document.getElementById(id).value;
-
 }
 
 function setupYears(){
+  const y = document.getElementById("yearSelect");
 
-  const y =
-    document.getElementById("yearSelect");
+  const years = [...new Set(
+    allRows.map(r => String(r.date).slice(0,4)).filter(Boolean)
+  )].sort().reverse();
 
-  const years = [
-    ...new Set(
-      allRows
-        .map(r => String(r.date).slice(0,4))
-        .filter(Boolean)
-    )
-  ].sort().reverse();
+  const now = String(new Date().getFullYear());
 
-  const now =
-    String(new Date().getFullYear());
+  if(!years.includes(now)) years.unshift(now);
 
-  if(!years.includes(now)){
-    years.unshift(now);
-  }
-
-  y.innerHTML =
-    years.map(v =>
-      `<option value="${v}">${v}年</option>`
-    ).join("");
-
+  y.innerHTML = years.map(v => `<option value="${v}">${v}年</option>`).join("");
 }
 
 function renderDaily(){
-
-  const area =
-    document.getElementById("dailyArea");
+  const area = document.getElementById("dailyArea");
 
   if(!allRows.length){
-
     area.innerHTML = "データなし";
-
     return;
-
   }
 
-  const groups =
-    groupByDayPlace(allRows)
-      .sort((a,b)=>
-        String(b.date).localeCompare(String(a.date))
-      );
+  const groups = groupByDayPlace(allRows)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
 
-  area.innerHTML =
-    groups.map((g,i)=>
-      dayFold(g, i===0)
-    ).join("");
-
+  area.innerHTML = groups.map((g,i) => dayFold(g, i===0)).join("");
 }
 
 function dayFold(g, open){
-
   return `
     <details class="fold" ${open ? "open" : ""}>
-
       <summary class="foldHead">
-        ${g.date}（${weekday(g.date)}）
-        ${escapeHtml(g.place)}
-        ${escapeHtml(g.weather)}
-        ${escapeHtml(g.wind)}
-        ${yen(g.total)}
+        ${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${escapeHtml(g.wind)} ${yen(g.total)}
       </summary>
 
       <div class="foldBody">
-
         ${g.rows.map(r => `
-
           <div class="line">
-
             <div class="leftLine">
-
-              <span class="itemName">
-                ${escapeHtml(r.item)}
-              </span>
-
-              <span>
-                ${escapeHtml(r.staff || "")}
-              </span>
-
+              <span class="itemName">${escapeHtml(r.item)}</span>
+              <span>${escapeHtml(r.staff || "")}</span>
             </div>
-
             <b>${yen(r.sales)}</b>
-
           </div>
-
         `).join("")}
 
         <hr>
 
-        <div class="line">
-
-          <span>
-            経費
-            ${yen(g.costUnit)}
-            ${g.count}本
-            ${yen(g.cost)}
-            　返し
-            ${yen(g.back)}
-          </span>
-
+        <div class="expenseLine">
+          経費 ${yen(g.costUnit)} ${g.count}本 ${yen(g.costTotal)}　返し ${yen(g.back)}
         </div>
-
       </div>
-
     </details>
   `;
-
 }
 
 function renderYearly(){
-
-  const year =
-    document.getElementById("yearSelect").value ||
-    String(new Date().getFullYear());
-
-  const rows =
-    allRows.filter(r =>
-      String(r.date).startsWith(year)
-    );
-
-  const area =
-    document.getElementById("yearlyArea");
+  const year = document.getElementById("yearSelect").value || String(new Date().getFullYear());
+  const rows = allRows.filter(r => String(r.date).startsWith(year));
+  const area = document.getElementById("yearlyArea");
 
   const total = sum(rows,"sales");
-
-  const cost = sum(rows,"cost");
+  const cost = sum(rows,"costTotal");
 
   let html = `
     <div class="summary">
@@ -943,18 +560,10 @@ function renderYearly(){
   `;
 
   for(let m=1; m<=12; m++){
+    const mm = String(m).padStart(2,"0");
+    const mr = rows.filter(r => String(r.date).slice(5,7) === mm);
 
-    const mm =
-      String(m).padStart(2,"0");
-
-    const mr =
-      rows.filter(r =>
-        String(r.date).slice(5,7) === mm
-      );
-
-    if(!mr.length){
-      continue;
-    }
+    if(!mr.length) continue;
 
     const isCurrent =
       year === String(new Date().getFullYear()) &&
@@ -962,166 +571,94 @@ function renderYearly(){
 
     html += `
       <details class="fold" ${isCurrent ? "open" : ""}>
-
-        <summary class="foldHead">
-          ${m}月 ${yen(sum(mr,"sales"))}
-        </summary>
-
+        <summary class="foldHead">${m}月 ${yen(sum(mr,"sales"))}</summary>
         <div class="foldBody">
           ${renderPlacesInMonth(mr)}
         </div>
-
       </details>
     `;
-
   }
 
   area.innerHTML = html;
-
 }
 
 function renderPlacesInMonth(rows){
-
   const by = {};
 
-  rows.forEach(r=>{
-
-    const key =
-      r.place || "未入力";
-
-    if(!by[key]){
-      by[key] = [];
-    }
-
+  rows.forEach(r => {
+    const key = r.place || "未入力";
+    if(!by[key]) by[key] = [];
     by[key].push(r);
-
   });
 
-  return Object.keys(by).map(place=>{
-
+  return Object.keys(by).map(place => {
     const pr = by[place];
 
     return `
       <details class="fold">
-
-        <summary class="foldHead">
-          ${escapeHtml(place)}
-          ${yen(sum(pr,"sales"))}
-        </summary>
-
+        <summary class="foldHead">${escapeHtml(place)} ${yen(sum(pr,"sales"))}</summary>
         <div class="foldBody">
-          ${groupByDayPlace(pr).map(g =>
-            dayFold(g,false)
-          ).join("")}
+          ${groupByDayPlace(pr).map(g => dayFold(g,false)).join("")}
         </div>
-
       </details>
     `;
-
   }).join("");
-
 }
 
 function groupByDayPlace(rows){
-
   const map = {};
 
-  rows.forEach(r=>{
-
-    const key =
-      r.date + "|" + r.place;
+  rows.forEach(r => {
+    const key = r.date + "|" + r.place;
 
     if(!map[key]){
-
       map[key] = {
-
         date: r.date,
         place: r.place,
         weather: r.weather,
         wind: r.wind,
         rows: [],
         total: 0,
-        cost: 0,
-        count: 0,
-        costUnit: 0,
-        back: 0
-
+        costUnit: Number(r.costUnit || 0),
+        count: Number(r.count || 0),
+        costTotal: Number(r.costTotal || 0),
+        back: Number(r.back || 0)
       };
-
     }
 
     map[key].rows.push(r);
-
     map[key].total += Number(r.sales || 0);
-
-    map[key].cost += Number(r.cost || 0);
-
-    map[key].count += Number(r.count || 0);
-
-    map[key].costUnit = Number(r.costUnit || 0);
-
-    map[key].back += Number(r.back || 0);
-
   });
 
   return Object.values(map);
-
 }
 
 function sum(rows,key){
-
-  return rows.reduce((a,r)=>
-    a + Number(r[key] || 0)
-  ,0);
-
+  return rows.reduce((a,r) => a + Number(r[key] || 0), 0);
 }
 
 function yen(n){
-
   return Number(n || 0).toLocaleString() + "円";
-
 }
 
 function weekday(date){
-
   const d = new Date(date);
-
-  return [
-    "日",
-    "月",
-    "火",
-    "水",
-    "木",
-    "金",
-    "土"
-  ][d.getDay()] || "";
-
+  return ["日","月","火","水","木","金","土"][d.getDay()] || "";
 }
 
 function escapeHtml(s){
-
-  return String(s || "")
-    .replace(/[&<>"']/g, m => ({
-
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#039;"
-
-    }[m]));
-
+  return String(s || "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
 }
 
 function escapeAttr(s){
-
-  return String(s || "")
-    .replace(/\\/g,"\\\\")
-    .replace(/'/g,"\\'");
-
+  return String(s || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 }
-
 </script>
-
 </body>
 </html>
