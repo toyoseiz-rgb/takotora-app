@@ -82,379 +82,606 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
 
       <label>現場名</label>
       <input type="text" id="place" list="placeList" placeholder="例：浅間">
-      <datalist
-<datalist id="placeList"></datalist>
+      <datalist id="placeList"></datalist>
 
-<div class="row">
-  <div>
-    <label>天気</label>
-    <select id="weather">
-      <option>晴</option>
-      <option>曇</option>
-      <option>雨</option>
-      <option>小雨</option>
-      <option>大雨</option>
-      <option>台風</option>
-    </select>
-  </div>
+      <div id="recentItems" class="notice hidden"></div>
 
-  <div>
-    <label>風</label>
-    <select id="wind">
-      <option>なし</option>
-      <option>風あり</option>
-      <option>強風</option>
-    </select>
-  </div>
-</div>
+      <div class="row">
+        <div>
+          <label>天気</label>
+          <input type="text" id="weather" list="weatherList" placeholder="晴">
+          <datalist id="weatherList">
+            <option value="晴">
+            <option value="曇">
+            <option value="雨">
+            <option value="小雨">
+            <option value="大雨">
+            <option value="台風">
+          </datalist>
+        </div>
+        <div>
+          <label>風</label>
+          <input type="text" id="wind" list="windList" placeholder="なし">
+          <datalist id="windList">
+            <option value="">
+            <option value="風あり">
+            <option value="強風">
+          </datalist>
+        </div>
+      </div>
 
-<div id="itemButtons" class="itemBtns"></div>
+      <label>品目</label>
+      <input type="text" id="item" list="itemList" placeholder="例：やきとり">
+      <datalist id="itemList"></datalist>
 
-<div id="itemsArea"></div>
+      <div id="itemButtons" class="itemBtns"></div>
 
-<button class="btnMini" onclick="addItemRow()">品目を追加</button>
+      <div class="row">
+        <div>
+          <label>売上</label>
+          <input type="number" id="sales">
+        </div>
+        <div>
+          <label>担当</label>
+          <input type="text" id="staff">
+        </div>
+      </div>
 
-<div class="row">
-  <div>
-    <label>経費単価</label>
-    <input type="number" id="costUnit">
-  </div>
+      <button class="btnMini" onclick="addItem()">品目を追加</button>
 
-  <div>
-    <label>本数</label>
-    <input type="number" id="count">
-  </div>
-</div>
+      <div id="addedItems" class="addedBox hidden"></div>
 
-<label>返し</label>
-<input type="number" id="back">
+      <div class="row">
+        <div>
+          <label>経費単価</label>
+          <input type="number" id="costUnit">
+        </div>
+        <div>
+          <label>本数</label>
+          <input type="number" id="count">
+        </div>
+      </div>
 
-<label>メモ</label>
-<textarea id="memo"></textarea>
+      <label>返し</label>
+      <input type="number" id="back">
 
-<button class="btn" onclick="save()">保存する</button>
+      <label>メモ</label>
+      <textarea id="memo"></textarea>
 
-<div class="status" id="status"></div>
+      <button class="btn" onclick="saveData()">保存する</button>
+      <div class="status" id="result"></div>
 
-</div>
-</section>
-
-<section id="dailyScreen" class="hidden">
-  <div class="card">
-    <div class="notice">
-      日別は確認専用。最新が上、直近だけ開きます。
     </div>
+  </section>
 
-    <div id="dailyArea"></div>
-  </div>
+  <section id="dailyScreen" class="hidden">
+    <div class="card">
+      <div class="notice">日別は確認専用。最新が上、直近だけ開きます。</div>
+      <div id="dailyArea">読み込み中...</div>
+    </div>
+  </section>
+
+  <section id="yearlyScreen" class="hidden">
+    <div class="card">
+      <label>表示年</label>
+      <select id="yearSelect" onchange="renderYearly()"></select>
+      <div class="notice">年間は確認専用。1月から12月順、当月だけ開きます。</div>
+      <div id="yearlyArea">読み込み中...</div>
+    </div>
+  </section>
+
 </section>
 
-<section id="yearlyScreen" class="hidden">
-  <div class="card">
-    <div id="yearlyArea"></div>
-  </div>
-</section>
-
-</section>
 </div>
 
 <script>
-
-const API_URL = "YOUR_GAS_URL";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNHU8NG8B0Uq0_LcN4rpEi2-wqm-Y3LZpyxIeKQ-SIHGBFTjKGaKsvPOctGTFq4nFuMg/exec";
+const PIN = "2931";
 
 let allRows = [];
-let siteMaster = [];
-let itemMaster = [];
+let placeMasters = [];
+let itemMasters = [];
+let topItems = [];
+let entryItems = [];
 
-const itemRows = [];
+document.getElementById("date").value = new Date().toISOString().slice(0,10);
+
+document.getElementById("pinInput").addEventListener("keydown", e => {
+  if(e.key === "Enter") unlock();
+});
+
+document.getElementById("place").addEventListener("input", () => {
+  showRecentItems();
+});
+
+document.getElementById("place").addEventListener("change", () => {
+  showRecentItems();
+  updateWeather();
+});
+
+if(localStorage.getItem("takotoraUnlock") === "1"){
+  showMain();
+}
 
 function unlock(){
-  if(document.getElementById("pinInput").value !== "1010"){
+  if(document.getElementById("pinInput").value.trim() === PIN){
+    localStorage.setItem("takotoraUnlock","1");
+    showMain();
+  }else{
     alert("暗証番号が違います");
+  }
+}
+
+function showMain(){
+  document.getElementById("lockScreen").style.display = "none";
+  document.getElementById("mainScreen").classList.remove("hidden");
+  refreshAll();
+}
+
+function showScreen(name){
+  ["input","daily","yearly"].forEach(n => {
+    document.getElementById(n+"Screen").classList.toggle("hidden", n !== name);
+    document.getElementById("tab"+cap(n)).classList.toggle("active", n === name);
+  });
+
+  if(name === "daily") renderDaily();
+  if(name === "yearly") renderYearly();
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function cap(s){
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+function jsonp(url){
+  return new Promise((resolve,reject) => {
+    const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*9999);
+
+    window[cb] = data => {
+      delete window[cb];
+      script.remove();
+      resolve(data);
+    };
+
+    const script = document.createElement("script");
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+async function refreshAll(){
+  try{
+    const data = await jsonp(API_URL + "?action=list");
+
+    if(data && data.ok){
+      allRows = data.sales || [];
+      placeMasters = data.places || [];
+      itemMasters = data.items || [];
+
+      if(data.topItems && data.topItems.length){
+        topItems = data.topItems;
+      }else{
+        topItems = itemMasters.slice(0,10);
+      }
+
+      setupMasters();
+      setupYears();
+      renderDaily();
+      renderYearly();
+      showRecentItems();
+    }
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function getItemName(obj){
+  return obj["品目"] || obj.name || obj.item || "";
+}
+
+function setupMasters(){
+  document.getElementById("placeList").innerHTML =
+    placeMasters.map(p => `<option value="${escapeHtml(p["現場名"] || p.name || "")}">`).join("");
+
+  document.getElementById("itemList").innerHTML =
+    itemMasters.map(i => `<option value="${escapeHtml(getItemName(i))}">`).join("");
+
+  const buttons = topItems && topItems.length ? topItems : itemMasters.slice(0,10);
+
+  document.getElementById("itemButtons").innerHTML =
+    buttons.slice(0,10).map(i => {
+      const name = getItemName(i);
+      return `<button class="itemBtn" onclick="setItem('${escapeAttr(name)}')">${escapeHtml(name)}</button>`;
+    }).join("");
+}
+
+function setItem(name){
+  document.getElementById("item").value = name;
+}
+
+function addItem(){
+  const name = val("item").trim();
+  const sales = Number(val("sales") || 0);
+  const staff = val("staff").trim();
+
+  if(!name){
+    alert("品目を入れてください");
     return;
   }
 
-  document.getElementById("lockScreen").classList.add("hidden");
-  document.getElementById("mainScreen").classList.remove("hidden");
-
-  init();
-}
-
-function showScreen(type){
-
-  ["input","daily","yearly"].forEach(v=>{
-    document.getElementById(v+"Screen").classList.add("hidden");
-    document.getElementById("tab"+capitalize(v)).classList.remove("active");
+  entryItems.push({
+    name: name,
+    sales: sales,
+    staff: staff
   });
 
-  document.getElementById(type+"Screen").classList.remove("hidden");
-  document.getElementById("tab"+capitalize(type)).classList.add("active");
+  document.getElementById("item").value = "";
+  document.getElementById("sales").value = "";
+  document.getElementById("staff").value = "";
 
+  renderEntryItems();
 }
 
-function capitalize(v){
-  return v.charAt(0).toUpperCase()+v.slice(1);
-}
+function renderEntryItems(){
+  const box = document.getElementById("addedItems");
 
-async function init(){
-
-  document.getElementById("date").value =
-    new Date().toISOString().split("T")[0];
-
-  const res = await fetch(API_URL + "?action=init");
-  const data = await res.json();
-
-  siteMaster = data.sites || [];
-  itemMaster = data.items || [];
-  allRows = data.rows || [];
-
-  renderPlaces();
-  renderTopButtons();
-
-  addItemRow();
-
-  renderDaily();
-  renderYearly();
-
-}
-  function renderPlaces(){
-
-  document.getElementById("placeList").innerHTML =
-    siteMaster.map(v =>
-      `<option value="${escapeHtml(v.name)}">`
-    ).join("");
-
-}
-
-function renderTopButtons(){
-
-  let top = [...itemMaster];
-
-  const hasCount =
-    top.some(v => Number(v.count || 0) > 0);
-
-  if(hasCount){
-
-    top.sort((a,b)=>
-      Number(b.count || 0)
-      - Number(a.count || 0)
-    );
-
+  if(!entryItems.length){
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
   }
 
-  top = top.slice(0,10);
+  box.classList.remove("hidden");
 
-  document.getElementById("itemButtons").innerHTML =
-    top.map(v => `
-      <button
-        class="itemBtn"
-        onclick="quickItem('${escapeAttr(v.name)}')"
-      >
-        ${escapeHtml(v.name)}
-      </button>
-    `).join("");
-
-}
-
-function quickItem(name){
-
-  const last =
-    document.querySelector(".itemName:last-of-type");
-
-  if(last){
-    last.value = name;
-  }
-
-}
-
-function addItemRow(){
-
-  itemRows.push({
-    item:"",
-    sales:"",
-    staff:""
-  });
-
-  renderItemRows();
-
-}
-
-function renderItemRows(){
-
-  document.getElementById("itemsArea").innerHTML =
-    itemRows.map((v,i)=>`
-
-      <div class="addedBox">
-
-        <label>品目</label>
-
-        <input
-          class="itemName"
-          value="${escapeHtml(v.item)}"
-          onchange="updateItem(${i},this.value)"
-          list="itemList"
-        >
-
-        <label>売上</label>
-
-        <input
-          type="number"
-          value="${escapeHtml(v.sales)}"
-          onchange="updateSales(${i},this.value)"
-        >
-
-        <label>担当</label>
-
-        <input
-          value="${escapeHtml(v.staff)}"
-          onchange="updateStaff(${i},this.value)"
-        >
-
-        ${
-          itemRows.length > 1
-          ? `
-            <button
-              class="delBtn"
-              onclick="removeItem(${i})"
-            >
-              削除
-            </button>
-          `
-          : ""
-        }
-
-      </div>
-
-    `).join("");
-
-  renderItemList();
-
-}
-
-function renderItemList(){
-
-  let html =
-    `<datalist id="itemList">`;
-
-  html += itemMaster.map(v=>
-    `<option value="${escapeHtml(v.name)}">`
-  ).join("");
-
-  html += `</datalist>`;
-
-  document.body.insertAdjacentHTML(
-    "beforeend",
-    html
-  );
-
-}
-
-function updateItem(i,v){
-  itemRows[i].item = v;
-}
-
-function updateSales(i,v){
-  itemRows[i].sales = v;
-}
-
-function updateStaff(i,v){
-  itemRows[i].staff = v;
+  box.innerHTML = entryItems.map((it,i) => `
+    <div class="addedRow">
+      <div>${escapeHtml(it.name)}　${escapeHtml(it.staff || "")}</div>
+      <b>${yen(it.sales)}</b>
+      <button class="delBtn" onclick="removeItem(${i})">削除</button>
+    </div>
+  `).join("");
 }
 
 function removeItem(i){
-
-  itemRows.splice(i,1);
-
-  renderItemRows();
-
+  entryItems.splice(i,1);
+  renderEntryItems();
 }
-  async function save(){
 
-  const rows = itemRows.filter(v =>
-    v.item || v.sales || v.staff
-  );
+function showRecentItems(){
+  const place = document.getElementById("place").value.trim();
+  const box = document.getElementById("recentItems");
 
-  if(!rows.length){
-    alert("品目を入力してください");
+  if(!place){
+    box.classList.add("hidden");
     return;
   }
 
-  const body = {
-    date:
-      document.getElementById("date").value,
+  const rows = allRows
+    .filter(r => r.place === place)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
 
-    place:
-      document.getElementById("place").value,
+  if(!rows.length){
+    box.classList.add("hidden");
+    return;
+  }
 
-    weather:
-      document.getElementById("weather").value,
+  const latestDate = rows[0].date;
 
-    wind:
-      document.getElementById("wind").value,
+  const items = [...new Set(
+    rows
+      .filter(r => r.date === latestDate)
+      .map(r => r.item)
+      .filter(Boolean)
+  )];
 
-    costUnit:
-      document.getElementById("costUnit").value,
+  if(!items.length){
+    box.classList.add("hidden");
+    return;
+  }
 
-    count:
-      document.getElementById("count").value,
+  box.classList.remove("hidden");
+  box.innerHTML = "直近の品目候補<br>" +
+    items.map(i => `<button class="linkBtn" onclick="setItem('${escapeAttr(i)}')">${escapeHtml(i)}</button>`).join("");
+}
 
-    back:
-      document.getElementById("back").value,
+function getWeatherLocation(){
+  const place = val("place").trim();
+  const master = placeMasters.find(p => (p["現場名"] || p.name || "") === place);
+  return master ? String(master["天気場所"] || master.weatherLocation || place) : place;
+}
 
-    memo:
-      document.getElementById("memo").value,
+async function updateWeather(){
+  const location = getWeatherLocation();
 
-    items: rows
+  if(!location) return;
+
+  try{
+    const res = await fetch("https://wttr.in/" + encodeURIComponent(location) + "?format=j1");
+    const data = await res.json();
+
+    const current = data.current_condition[0];
+    const text = current.weatherDesc[0].value;
+    const windKmph = Number(current.windspeedKmph || 0);
+
+    document.getElementById("weather").value = normalizeWeather(text);
+    document.getElementById("wind").value = normalizeWind(windKmph);
+
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function normalizeWeather(text){
+  const t = String(text || "");
+
+  if(t.includes("typhoon") || t.includes("storm") || t.includes("雷")) return "台風";
+  if(t.includes("Heavy") || t.includes("大雨")) return "大雨";
+  if(t.includes("Light") || t.includes("小雨")) return "小雨";
+  if(t.includes("rain") || t.includes("Rain") || t.includes("雨")) return "雨";
+  if(t.includes("cloud") || t.includes("Cloud") || t.includes("Overcast") || t.includes("曇")) return "曇";
+
+  return "晴";
+}
+
+function normalizeWind(kmph){
+  const n = Number(kmph || 0);
+
+  if(n >= 15) return "強風";
+  if(n >= 5) return "風あり";
+
+  return "";
+}
+
+async function saveData(){
+  if(!entryItems.length){
+    addItem();
+  }
+
+  if(!entryItems.length){
+    return;
+  }
+
+  const costUnit = Number(val("costUnit") || 0);
+  const count = Number(val("count") || 0);
+  const costTotal = costUnit * count;
+
+  const data = {
+    date: val("date"),
+    place: val("place"),
+    weatherLocation: getWeatherLocation(),
+    weather: val("weather"),
+    wind: val("wind"),
+    items: entryItems,
+    costUnit: costUnit,
+    count: count,
+    costTotal: costTotal,
+    back: Number(val("back") || 0),
+    memo: val("memo")
   };
 
-  document.getElementById("status").innerText =
-    "保存中...";
+  document.getElementById("result").innerText = "保存中...";
 
-  await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify(body)
+  try{
+    await fetch(API_URL, {
+      method:"POST",
+      mode:"no-cors",
+      body: JSON.stringify(data)
+    });
+
+    document.getElementById("result").innerText = "保存完了";
+
+    clearForm();
+
+    setTimeout(refreshAll,900);
+
+  }catch(e){
+    document.getElementById("result").innerText = "保存失敗";
+  }
+}
+
+function clearForm(){
+  [
+    "date",
+    "place",
+    "weather",
+    "wind",
+    "item",
+    "sales",
+    "staff",
+    "costUnit",
+    "count",
+    "back",
+    "memo"
+  ].forEach(id => {
+    document.getElementById(id).value = "";
   });
 
-  document.getElementById("status").innerText =
-    "保存完了";
+  document.getElementById("date").value = new Date().toISOString().slice(0,10);
 
-  location.reload();
+  entryItems = [];
+  renderEntryItems();
 
+  document.getElementById("recentItems").classList.add("hidden");
+}
+
+function val(id){
+  return document.getElementById(id).value;
+}
+
+function setupYears(){
+  const y = document.getElementById("yearSelect");
+
+  const years = [...new Set(
+    allRows.map(r => String(r.date).slice(0,4)).filter(Boolean)
+  )].sort().reverse();
+
+  const now = String(new Date().getFullYear());
+
+  if(!years.includes(now)) years.unshift(now);
+
+  y.innerHTML = years.map(v => `<option value="${v}">${v}年</option>`).join("");
 }
 
 function renderDaily(){
+  const area = document.getElementById("dailyArea");
 
-  document.getElementById("dailyArea").innerHTML =
-    "<div class='notice'>読み込み済み</div>";
+  if(!allRows.length){
+    area.innerHTML = "データなし";
+    return;
+  }
 
+  const groups = groupByDayPlace(allRows)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+
+  area.innerHTML = groups.map((g,i) => dayFold(g, i===0)).join("");
+}
+
+function dayFold(g, open){
+  return `
+    <details class="fold" ${open ? "open" : ""}>
+      <summary class="foldHead">
+        ${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${escapeHtml(g.wind)} ${yen(g.total)}
+      </summary>
+
+      <div class="foldBody">
+        ${g.rows.map(r => `
+          <div class="line">
+            <div class="leftLine">
+              <span class="itemName">${escapeHtml(r.item)}</span>
+              <span>${escapeHtml(r.staff || "")}</span>
+            </div>
+            <b>${yen(r.sales)}</b>
+          </div>
+        `).join("")}
+
+        <hr>
+
+        <div class="expenseLine">
+          経費 ${yen(g.costUnit)} ${g.count}本 ${yen(g.costTotal)}　返し ${yen(g.back)}
+        </div>
+      </div>
+    </details>
+  `;
 }
 
 function renderYearly(){
+  const year = document.getElementById("yearSelect").value || String(new Date().getFullYear());
+  const rows = allRows.filter(r => String(r.date).startsWith(year));
+  const area = document.getElementById("yearlyArea");
 
-  document.getElementById("yearlyArea").innerHTML =
-    "<div class='notice'>読み込み済み</div>";
+  const total = sum(rows,"sales");
+  const cost = sum(rows,"costTotal");
 
+  let html = `
+    <div class="summary">
+      ${year}年<br>
+      売上 ${yen(total)}<br>
+      経費 ${yen(cost)}
+    </div>
+  `;
+
+  for(let m=1; m<=12; m++){
+    const mm = String(m).padStart(2,"0");
+    const mr = rows.filter(r => String(r.date).slice(5,7) === mm);
+
+    if(!mr.length) continue;
+
+    const isCurrent =
+      year === String(new Date().getFullYear()) &&
+      m === new Date().getMonth()+1;
+
+    html += `
+      <details class="fold" ${isCurrent ? "open" : ""}>
+        <summary class="foldHead">${m}月 ${yen(sum(mr,"sales"))}</summary>
+        <div class="foldBody">
+          ${renderPlacesInMonth(mr)}
+        </div>
+      </details>
+    `;
+  }
+
+  area.innerHTML = html;
 }
 
-function escapeHtml(v){
+function renderPlacesInMonth(rows){
+  const by = {};
 
-  return String(v || "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  rows.forEach(r => {
+    const key = r.place || "未入力";
+    if(!by[key]) by[key] = [];
+    by[key].push(r);
+  });
 
+  return Object.keys(by).map(place => {
+    const pr = by[place];
+
+    return `
+      <details class="fold">
+        <summary class="foldHead">${escapeHtml(place)} ${yen(sum(pr,"sales"))}</summary>
+        <div class="foldBody">
+          ${groupByDayPlace(pr).map(g => dayFold(g,false)).join("")}
+        </div>
+      </details>
+    `;
+  }).join("");
 }
 
-function escapeAttr(v){
+function groupByDayPlace(rows){
+  const map = {};
 
-  return String(v || "")
-    .replace(/\\/g,"\\\\")
-    .replace(/'/g,"\\'");
+  rows.forEach(r => {
+    const key = r.date + "|" + r.place;
 
+    if(!map[key]){
+      map[key] = {
+        date: r.date,
+        place: r.place,
+        weather: r.weather,
+        wind: r.wind,
+        rows: [],
+        total: 0,
+        costUnit: Number(r.costUnit || 0),
+        count: Number(r.count || 0),
+        costTotal: Number(r.costTotal || 0),
+        back: Number(r.back || 0)
+      };
+    }
+
+    map[key].rows.push(r);
+    map[key].total += Number(r.sales || 0);
+  });
+
+  return Object.values(map);
 }
 
+function sum(rows,key){
+  return rows.reduce((a,r) => a + Number(r[key] || 0), 0);
+}
+
+function yen(n){
+  return Number(n || 0).toLocaleString() + "円";
+}
+
+function weekday(date){
+  const d = new Date(date);
+  return ["日","月","火","水","木","金","土"][d.getDay()] || "";
+}
+
+function escapeHtml(s){
+  return String(s || "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function escapeAttr(s){
+  return String(s || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
 </script>
 </body>
 </html>
