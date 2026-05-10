@@ -89,11 +89,24 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <div class="row">
         <div>
           <label>天気</label>
-          <input type="text" id="weather" readonly>
+          <input type="text" id="weather" list="weatherList" placeholder="晴">
+          <datalist id="weatherList">
+            <option value="晴">
+            <option value="曇">
+            <option value="雨">
+            <option value="小雨">
+            <option value="大雨">
+            <option value="台風">
+          </datalist>
         </div>
         <div>
           <label>風</label>
-          <input type="text" id="wind" readonly>
+          <input type="text" id="wind" list="windList" placeholder="なし">
+          <datalist id="windList">
+            <option value="">
+            <option value="風あり">
+            <option value="強風">
+          </datalist>
         </div>
       </div>
 
@@ -363,9 +376,7 @@ function showRecentItems(){
 
 function getWeatherLocation(){
   const place = val("place").trim();
-
   const master = placeMasters.find(p => p["現場名"] === place);
-
   return master ? String(master["天気場所"] || place) : place;
 }
 
