@@ -83,3 +83,378 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <label>現場名</label>
       <input type="text" id="place" list="placeList" placeholder="例：浅間">
       <datalist
+<datalist id="placeList"></datalist>
+
+<div class="row">
+  <div>
+    <label>天気</label>
+    <select id="weather">
+      <option>晴</option>
+      <option>曇</option>
+      <option>雨</option>
+      <option>小雨</option>
+      <option>大雨</option>
+      <option>台風</option>
+    </select>
+  </div>
+
+  <div>
+    <label>風</label>
+    <select id="wind">
+      <option>なし</option>
+      <option>風あり</option>
+      <option>強風</option>
+    </select>
+  </div>
+</div>
+
+<div id="itemButtons" class="itemBtns"></div>
+
+<div id="itemsArea"></div>
+
+<button class="btnMini" onclick="addItemRow()">品目を追加</button>
+
+<div class="row">
+  <div>
+    <label>経費単価</label>
+    <input type="number" id="costUnit">
+  </div>
+
+  <div>
+    <label>本数</label>
+    <input type="number" id="count">
+  </div>
+</div>
+
+<label>返し</label>
+<input type="number" id="back">
+
+<label>メモ</label>
+<textarea id="memo"></textarea>
+
+<button class="btn" onclick="save()">保存する</button>
+
+<div class="status" id="status"></div>
+
+</div>
+</section>
+
+<section id="dailyScreen" class="hidden">
+  <div class="card">
+    <div class="notice">
+      日別は確認専用。最新が上、直近だけ開きます。
+    </div>
+
+    <div id="dailyArea"></div>
+  </div>
+</section>
+
+<section id="yearlyScreen" class="hidden">
+  <div class="card">
+    <div id="yearlyArea"></div>
+  </div>
+</section>
+
+</section>
+</div>
+
+<script>
+
+const API_URL = "YOUR_GAS_URL";
+
+let allRows = [];
+let siteMaster = [];
+let itemMaster = [];
+
+const itemRows = [];
+
+function unlock(){
+  if(document.getElementById("pinInput").value !== "1010"){
+    alert("暗証番号が違います");
+    return;
+  }
+
+  document.getElementById("lockScreen").classList.add("hidden");
+  document.getElementById("mainScreen").classList.remove("hidden");
+
+  init();
+}
+
+function showScreen(type){
+
+  ["input","daily","yearly"].forEach(v=>{
+    document.getElementById(v+"Screen").classList.add("hidden");
+    document.getElementById("tab"+capitalize(v)).classList.remove("active");
+  });
+
+  document.getElementById(type+"Screen").classList.remove("hidden");
+  document.getElementById("tab"+capitalize(type)).classList.add("active");
+
+}
+
+function capitalize(v){
+  return v.charAt(0).toUpperCase()+v.slice(1);
+}
+
+async function init(){
+
+  document.getElementById("date").value =
+    new Date().toISOString().split("T")[0];
+
+  const res = await fetch(API_URL + "?action=init");
+  const data = await res.json();
+
+  siteMaster = data.sites || [];
+  itemMaster = data.items || [];
+  allRows = data.rows || [];
+
+  renderPlaces();
+  renderTopButtons();
+
+  addItemRow();
+
+  renderDaily();
+  renderYearly();
+
+}
+  function renderPlaces(){
+
+  document.getElementById("placeList").innerHTML =
+    siteMaster.map(v =>
+      `<option value="${escapeHtml(v.name)}">`
+    ).join("");
+
+}
+
+function renderTopButtons(){
+
+  let top = [...itemMaster];
+
+  const hasCount =
+    top.some(v => Number(v.count || 0) > 0);
+
+  if(hasCount){
+
+    top.sort((a,b)=>
+      Number(b.count || 0)
+      - Number(a.count || 0)
+    );
+
+  }
+
+  top = top.slice(0,10);
+
+  document.getElementById("itemButtons").innerHTML =
+    top.map(v => `
+      <button
+        class="itemBtn"
+        onclick="quickItem('${escapeAttr(v.name)}')"
+      >
+        ${escapeHtml(v.name)}
+      </button>
+    `).join("");
+
+}
+
+function quickItem(name){
+
+  const last =
+    document.querySelector(".itemName:last-of-type");
+
+  if(last){
+    last.value = name;
+  }
+
+}
+
+function addItemRow(){
+
+  itemRows.push({
+    item:"",
+    sales:"",
+    staff:""
+  });
+
+  renderItemRows();
+
+}
+
+function renderItemRows(){
+
+  document.getElementById("itemsArea").innerHTML =
+    itemRows.map((v,i)=>`
+
+      <div class="addedBox">
+
+        <label>品目</label>
+
+        <input
+          class="itemName"
+          value="${escapeHtml(v.item)}"
+          onchange="updateItem(${i},this.value)"
+          list="itemList"
+        >
+
+        <label>売上</label>
+
+        <input
+          type="number"
+          value="${escapeHtml(v.sales)}"
+          onchange="updateSales(${i},this.value)"
+        >
+
+        <label>担当</label>
+
+        <input
+          value="${escapeHtml(v.staff)}"
+          onchange="updateStaff(${i},this.value)"
+        >
+
+        ${
+          itemRows.length > 1
+          ? `
+            <button
+              class="delBtn"
+              onclick="removeItem(${i})"
+            >
+              削除
+            </button>
+          `
+          : ""
+        }
+
+      </div>
+
+    `).join("");
+
+  renderItemList();
+
+}
+
+function renderItemList(){
+
+  let html =
+    `<datalist id="itemList">`;
+
+  html += itemMaster.map(v=>
+    `<option value="${escapeHtml(v.name)}">`
+  ).join("");
+
+  html += `</datalist>`;
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    html
+  );
+
+}
+
+function updateItem(i,v){
+  itemRows[i].item = v;
+}
+
+function updateSales(i,v){
+  itemRows[i].sales = v;
+}
+
+function updateStaff(i,v){
+  itemRows[i].staff = v;
+}
+
+function removeItem(i){
+
+  itemRows.splice(i,1);
+
+  renderItemRows();
+
+}
+  async function save(){
+
+  const rows = itemRows.filter(v =>
+    v.item || v.sales || v.staff
+  );
+
+  if(!rows.length){
+    alert("品目を入力してください");
+    return;
+  }
+
+  const body = {
+    date:
+      document.getElementById("date").value,
+
+    place:
+      document.getElementById("place").value,
+
+    weather:
+      document.getElementById("weather").value,
+
+    wind:
+      document.getElementById("wind").value,
+
+    costUnit:
+      document.getElementById("costUnit").value,
+
+    count:
+      document.getElementById("count").value,
+
+    back:
+      document.getElementById("back").value,
+
+    memo:
+      document.getElementById("memo").value,
+
+    items: rows
+  };
+
+  document.getElementById("status").innerText =
+    "保存中...";
+
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(body)
+  });
+
+  document.getElementById("status").innerText =
+    "保存完了";
+
+  location.reload();
+
+}
+
+function renderDaily(){
+
+  document.getElementById("dailyArea").innerHTML =
+    "<div class='notice'>読み込み済み</div>";
+
+}
+
+function renderYearly(){
+
+  document.getElementById("yearlyArea").innerHTML =
+    "<div class='notice'>読み込み済み</div>";
+
+}
+
+function escapeHtml(v){
+
+  return String(v || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+function escapeAttr(v){
+
+  return String(v || "")
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'");
+
+}
+
+</script>
+</body>
+</html>
