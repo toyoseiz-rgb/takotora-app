@@ -75,7 +75,7 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <input type="date" id="date">
 
       <label>現場名</label>
-      <input type="text" id="place" list="placeList" placeholder="例：茅ヶ崎">
+      <input type="text" id="place" list="placeList" placeholder="例：浅間">
       <datalist id="placeList"></datalist>
 
       <div id="recentItems" class="notice hidden"></div>
@@ -346,9 +346,20 @@ function renderDaily(){
 }
 
 function dayFold(g, open){
+
+  let windText = "";
+
+  if(g.wind === "弱風"){
+    windText = " 風あり";
+  }
+
+  if(g.wind === "強風"){
+    windText = " 強風";
+  }
+
   return `
     <details class="fold" ${open ? "open" : ""}>
-      <summary class="foldHead">${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${yen(g.total)}</summary>
+      <summary class="foldHead">${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)}${windText} ${yen(g.total)}</summary>
       <div class="foldBody">
         ${g.rows.map(r => `
           <div class="line">
@@ -361,6 +372,7 @@ function dayFold(g, open){
         <div class="line"><span>返し</span><b>${yen(g.back)}</b></div>
       </div>
     </details>`;
+}
 }
 
 function renderYearly(){
@@ -433,6 +445,7 @@ function groupByDayPlace(rows){
         date: r.date,
         place: r.place,
         weather: r.weather,
+        wind: r.wind,
         rows: [],
         total: 0,
         cost: 0,
