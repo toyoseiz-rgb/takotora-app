@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
 <title>たこ虎 売上管理</title>
 
 <meta name="theme-color" content="#ffd000">
@@ -13,6 +14,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=10">
 
 <style>
+
 :root{
   --yellow:#ffd000;
   --gold:#b88600;
@@ -123,16 +125,6 @@ textarea{
   margin-top:18px;
 }
 
-.btnSmall{
-  padding:11px 10px;
-  border:none;
-  border-radius:14px;
-  background:var(--yellow);
-  font-size:17px;
-  font-weight:900;
-  box-shadow:0 4px var(--gold);
-}
-
 .tabs{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -228,6 +220,17 @@ textarea{
   font-size:16px;
 }
 
+.leftLine{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.itemName{
+  min-width:90px;
+  font-weight:700;
+}
+
 .line b{
   font-size:18px;
 }
@@ -244,6 +247,7 @@ hr{
   border-top:1px solid #eee;
   margin:10px 0;
 }
+
 </style>
 </head>
 
@@ -306,16 +310,12 @@ hr{
 
         <div>
           <label>天気</label>
-          <input type="text" id="weather" placeholder="晴れ">
+          <input type="text" id="weather" readonly>
         </div>
 
         <div>
           <label>風</label>
-          <select id="wind">
-            <option>なし</option>
-            <option>弱風</option>
-            <option>強風</option>
-          </select>
+          <input type="text" id="wind" readonly>
         </div>
 
       </div>
@@ -348,8 +348,8 @@ hr{
       <div class="row">
 
         <div>
-          <label>経費</label>
-          <input type="number" id="cost">
+          <label>経費単価</label>
+          <input type="number" id="costUnit">
         </div>
 
         <div>
@@ -431,8 +431,9 @@ document.getElementById("pinInput").addEventListener("keydown", e=>{
   }
 });
 
-document.getElementById("place").addEventListener("input", ()=>{
+document.getElementById("place").addEventListener("change", ()=>{
   showRecentItems();
+  updateWeather();
 });
 
 if(localStorage.getItem("takotoraUnlock")==="1"){
@@ -553,8 +554,6 @@ async function refreshAll(){
 
       renderYearly();
 
-      showRecentItems();
-
     }
 
   }catch(e){
@@ -578,7 +577,7 @@ function setupMasters(){
     ).join("");
 
   document.getElementById("itemButtons").innerHTML =
-    itemMasters.slice(0,10).map(i =>
+    itemMasters.map(i =>
       `<button class="itemBtn" onclick="setItem('${escapeAttr(i["品目"])}')">${escapeHtml(i["品目"])}</button>`
     ).join("");
 
@@ -650,21 +649,97 @@ function showRecentItems(){
 
 }
 
+function updateWeather(){
+
+  const place =
+    document.getElementById("place").value.trim();
+
+  if(!place) return;
+
+  fetch("https://wttr.in/" + encodeURIComponent(place) + "?format=j1")
+    .then(r => r.json())
+    .then(data => {
+
+      const current =
+        data.current_condition[0];
+
+      const text =
+        current.weatherDesc[0].value;
+
+      const wind =
+        Number(current.windspeedKmph || 0);
+
+      let weather = "晴";
+
+      if(text.includes("雨")) weather = "雨";
+      if(text.includes("曇")) weather = "曇";
+
+      if(text.includes("小雨")) weather = "小雨";
+
+      if(text.includes("大雨")) weather = "大雨";
+
+      if(text.includes("雷")) weather = "台風";
+
+      let windText = "";
+
+      if(wind >= 15){
+        windText = "強風";
+      }else if(wind >= 5){
+        windText = "風あり";
+      }
+
+      document.getElementById("weather").value =
+        weather;
+
+      document.getElementById("wind").value =
+        windText;
+
+    });
+
+}
+
 async function saveData(){
+
+  const costUnit =
+    Number(val("costUnit") || 0);
+
+  const count =
+    Number(val("count") || 0);
+
+  const costTotal =
+    costUnit * count;
 
   const data = {
 
     date: val("date"),
+
     place: val("place"),
-    weatherLocation: "",
+
+    weatherLocation:
+      (
+        placeMasters.find(p =>
+          p["現場名"] === val("place")
+        ) || {}
+      )["天気場所"] || "",
+
     weather: val("weather"),
+
     wind: val("wind"),
+
     item: val("item"),
+
     sales: Number(val("sales") || 0),
-    count: Number(val("count") || 0),
+
+    count: count,
+
     staff: val("staff"),
-    cost: Number(val("cost") || 0),
+
+    costUnit: costUnit,
+
+    costTotal: costTotal,
+
     back: Number(val("back") || 0),
+
     memo: val("memo")
 
   };
@@ -704,11 +779,12 @@ function clearForm(){
     "date",
     "place",
     "weather",
+    "wind",
     "item",
     "sales",
     "count",
     "staff",
-    "cost",
+    "costUnit",
     "back",
     "memo"
   ].forEach(id=>{
@@ -716,8 +792,6 @@ function clearForm(){
     document.getElementById(id).value = "";
 
   });
-
-  document.getElementById("wind").value = "なし";
 
   document.getElementById("recentItems")
     .classList.add("hidden");
@@ -785,49 +859,54 @@ function renderDaily(){
 
 function dayFold(g, open){
 
-  let windText = "";
-
-  if(g.wind === "弱風"){
-    windText = " 風あり";
-  }
-
-  if(g.wind === "強風"){
-    windText = " 強風";
-  }
-
   return `
     <details class="fold" ${open ? "open" : ""}>
 
       <summary class="foldHead">
         ${g.date}（${weekday(g.date)}）
         ${escapeHtml(g.place)}
-        ${escapeHtml(g.weather)}${windText}
+        ${escapeHtml(g.weather)}
+        ${escapeHtml(g.wind)}
         ${yen(g.total)}
       </summary>
 
       <div class="foldBody">
 
         ${g.rows.map(r => `
+
           <div class="line">
-            <span>
-              ${escapeHtml(r.item)}
-              ${escapeHtml(r.staff || "")}
-            </span>
+
+            <div class="leftLine">
+
+              <span class="itemName">
+                ${escapeHtml(r.item)}
+              </span>
+
+              <span>
+                ${escapeHtml(r.staff || "")}
+              </span>
+
+            </div>
 
             <b>${yen(r.sales)}</b>
+
           </div>
+
         `).join("")}
 
         <hr>
 
         <div class="line">
-          <span>経費</span>
-          <b>${yen(g.cost)}</b>
-        </div>
 
-        <div class="line">
-          <span>返し</span>
-          <b>${yen(g.back)}</b>
+          <span>
+            経費
+            ${yen(g.costUnit)}
+            ${g.count}本
+            ${yen(g.cost)}
+            　返し
+            ${yen(g.back)}
+          </span>
+
         </div>
 
       </div>
@@ -963,6 +1042,8 @@ function groupByDayPlace(rows){
         rows: [],
         total: 0,
         cost: 0,
+        count: 0,
+        costUnit: 0,
         back: 0
 
       };
@@ -974,6 +1055,10 @@ function groupByDayPlace(rows){
     map[key].total += Number(r.sales || 0);
 
     map[key].cost += Number(r.cost || 0);
+
+    map[key].count += Number(r.count || 0);
+
+    map[key].costUnit = Number(r.costUnit || 0);
 
     map[key].back += Number(r.back || 0);
 
