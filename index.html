@@ -9,160 +9,472 @@
 <meta name="apple-mobile-web-app-title" content="たこ虎">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=10">
+
 <style>
-:root{--yellow:#ffd000;--gold:#b88300;--black:#111}
+:root{--yellow:#ffd000;--gold:#b88600;--black:#111}
 *{box-sizing:border-box}
-body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#111;padding-bottom:112px}
-.header{position:sticky;top:0;z-index:20;background:linear-gradient(#ffe45c,#ffd000);border-bottom:6px solid var(--gold);padding:18px 14px 16px;text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em}
-.wrap{padding:18px;max-width:560px;margin:auto}
-.logo{width:126px;height:126px;margin:22px auto 18px}
-.logo img{width:100%;height:100%;border-radius:30px;display:block}
-.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.tab{background:#fff;border:0;border-radius:14px;padding:13px 6px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #777;color:#111}
-.tab.active{background:var(--yellow);box-shadow:0 3px 0 var(--gold)}
-.card{background:#fff;border-radius:26px;padding:20px;margin-bottom:18px;box-shadow:0 3px 18px rgba(0,0,0,.2)}
-label{font-weight:900;display:block;margin:14px 0 7px;font-size:18px}
-input,select,textarea{width:100%;padding:15px;font-size:18px;border-radius:14px;border:1px solid #ccc;margin-bottom:10px;background:#fff}
-textarea{height:90px}
+body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#111}
+.header{position:sticky;top:0;z-index:50;background:linear-gradient(#ffe45c,#ffd000);border-bottom:6px solid var(--gold);padding:16px;text-align:center}
+.header h1{margin:0;font-size:30px;font-weight:900}
+.wrap{max-width:560px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:28px;padding:20px;margin:14px 0 22px;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.logo{width:140px;height:140px;display:block;margin:14px auto;border-radius:32px}
+.lockTitle{font-size:42px;font-weight:900;text-align:center;line-height:1.12}
+.sub{text-align:center;font-size:20px;font-weight:800;color:#666;margin:12px 0}
+label{display:block;font-size:20px;font-weight:900;margin:15px 0 8px}
+input,select,textarea{width:100%;padding:15px;font-size:21px;border-radius:17px;border:2px solid #ddd;background:#fff}
+textarea{height:82px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.item{border:1px solid #ddd;border-radius:18px;padding:14px;margin-bottom:14px;background:#fafafa}
-.total{background:#111;color:#fff;padding:16px;border-radius:16px;text-align:center;font-size:24px;font-weight:900;margin-top:12px}
-button{width:100%;padding:16px;border:none;border-radius:16px;background:var(--yellow);color:#111;font-size:20px;font-weight:900;box-shadow:0 5px 0 var(--gold)}
-.saveBtn{position:fixed;bottom:18px;left:18px;right:18px;z-index:999;max-width:560px;margin:auto}
-.hidden{display:none}
-.listCard{background:#fff;border-radius:20px;padding:15px;margin-bottom:12px}
-.placeTitle{font-size:21px;font-weight:900}.money{font-size:19px;font-weight:900}.small{color:#555;font-size:14px;font-weight:700}
-.badge{display:inline-block;background:#ffd000;border-radius:999px;padding:4px 10px;font-weight:900;margin:3px 4px 3px 0}
-.compare{background:#fff7cf;border:1px solid #ffd000;border-radius:14px;padding:10px;margin:10px 0;font-weight:800}
-.jump{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:8px 12px;margin:4px 4px 0 0;font-weight:900;text-decoration:none;cursor:pointer}
-hr{border:0;border-top:1px solid #e5e5e5;margin:12px 0}
-.notice{background:#fff7cf;border:1px solid #ffd000;border-radius:14px;padding:12px;font-weight:800;margin-bottom:12px}
-.weatherBox{background:#f4f4f4;border-radius:14px;padding:12px;font-weight:800;margin:8px 0}
-#lockScreen{position:fixed;inset:0;background:#111;z-index:5000;display:flex;align-items:center;justify-content:center;padding:22px}
-#lockScreen .lockCard{background:#fff;border-radius:28px;padding:24px;max-width:380px;width:100%;text-align:center}
-#pinInput{text-align:center;font-size:28px;letter-spacing:.2em;font-weight:900}
-.err{color:#c00;font-weight:900;min-height:22px}
+.btn{width:100%;padding:18px;border:none;border-radius:22px;background:var(--yellow);font-size:29px;font-weight:900;box-shadow:0 7px var(--gold);margin-top:18px}
+.btnSmall{padding:11px 10px;border:none;border-radius:14px;background:var(--yellow);font-size:17px;font-weight:900;box-shadow:0 4px var(--gold)}
+.topbar{display:flex;gap:8px;margin:8px 0 12px;position:sticky;top:72px;z-index:40}
+.topbar button{flex:1}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.tab{background:#fff;border:none;border-radius:16px;padding:13px 6px;font-size:18px;font-weight:900;box-shadow:0 4px #aaa}
+.tab.active{background:var(--yellow);box-shadow:0 4px var(--gold)}
+.hidden{display:none!important}
+.notice{font-size:15px;background:#fff7c7;border:2px solid #ffd000;border-radius:14px;padding:10px;margin:10px 0;font-weight:900}
+.itemBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.itemBtn,.linkBtn{border:none;background:#111;color:#ffd000;border-radius:14px;padding:12px;font-size:17px;font-weight:900;margin:3px}
+.status{text-align:center;font-size:28px;font-weight:900;margin-top:14px}
+.fold{background:#fff;border:2px solid #eee;border-radius:18px;padding:12px;margin:10px 0}
+.foldHead{font-size:18px;font-weight:900;cursor:pointer;list-style:none}
+.foldHead::-webkit-details-marker{display:none}
+.foldBody{margin-top:10px;border-top:1px solid #eee;padding-top:10px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:16px}
+.line b{font-size:18px}
+.summary{font-size:22px;font-weight:900;line-height:1.65;margin-bottom:12px}
+.monthTitle{font-size:22px;font-weight:900;background:#111;color:#ffd000;border-radius:16px;padding:12px;margin:14px 0 8px}
+hr{border:none;border-top:1px solid #eee;margin:10px 0}
 </style>
 </head>
+
 <body>
+<div class="header"><h1>たこ虎 売上管理</h1></div>
 
-<div id="lockScreen">
-  <div class="lockCard">
-    <div class="logo" style="margin:0 auto 18px"><img src="icon.png.png"></div>
-    <div class="placeTitle">たこ虎 売上管理</div>
-    <div class="small">暗証番号を入力</div>
-    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="****">
-    <div class="err" id="pinErr"></div>
-    <button onclick="unlock()">開く</button>
-  </div>
-</div>
-
-<div class="header">たこ虎 売上管理</div>
 <div class="wrap">
-<div class="logo" style="margin:0 auto 18px"><img src="icon.png.png"></div>
-<div class="tabs"><button class="tab active" onclick="showTab('input',this)">入力</button><button class="tab" onclick="showTab('daily',this);loadData();">日別</button><button class="tab" onclick="showTab('yearly',this);loadData();">年間</button></div>
 
-<datalist id="placeList"></datalist>
-<datalist id="itemList"><option value="たこ焼き"></option><option value="やきとり"></option><option value="からあげ"></option><option value="いか焼き"></option><option value="フランク"></option><option value="レモンサワー"></option><option value="ハイボール"></option><option value="かき氷"></option><option value="あげもち"></option><option value="パイン"></option></datalist>
-
-<section id="inputScreen">
-<div class="card">
-<label>日付</label><input type="date" id="date">
-<label>現場名</label>
-<input type="text" id="place" list="placeList" placeholder="例：横浜" onchange="applyPlaceMaster();autoWeather();" onblur="applyPlaceMaster();autoWeather();">
-<div class="weatherBox" id="placeWeatherLocation">天気場所：現場マスター未選択</div>
-<div class="row">
-<div><label>天気</label><select id="weather"><option>晴れ</option><option>くもり</option><option>雨</option><option>小雨</option><option>猛暑</option></select></div>
-<div><label>風</label><select id="wind"><option value="">なし</option><option>風あり</option><option>強風</option></select></div>
-</div>
-<div class="weatherBox" id="weatherBox">現場名を選ぶと、現場マスターの天気場所で自動取得。不明時は横浜。</div>
-</div>
-
-<div class="card"><div id="items"></div><button onclick="addItem()">＋ 品目追加</button><div class="total" id="total">合計：0円</div></div>
-
-<div class="card">
-<div class="row">
-<div><label>経費 単価</label><input type="number" id="expenseUnit" value="20000" oninput="calc()"></div>
-<div><label>本数</label><select id="expenseCount" onchange="calc()"><option value="0">0本</option><option value="1">1本</option><option value="2">2本</option><option value="3">3本</option><option value="4">4本</option><option value="5">5本</option><option value="6">6本</option><option value="7">7本</option><option value="8">8本</option><option value="9">9本</option><option value="10">10本</option></select></div>
-</div>
-<div class="total" id="expenseTotal">経費：0円</div>
-<label>返し</label><input type="number" id="refund" value="0">
-<label>メモ</label><textarea id="memo" placeholder="配置・来年メモなど"></textarea>
-</div>
+<section id="lockScreen" class="card">
+  <img src="icon.png.png?v=20" class="logo">
+  <div class="lockTitle">たこ虎 売上管理</div>
+  <div class="sub">暗証番号を入力</div>
+  <input type="password" id="pinInput" inputmode="numeric" maxlength="4" placeholder="＊＊＊＊">
+  <button class="btn" onclick="unlock()">開く</button>
 </section>
 
-<section id="dailyScreen" class="hidden"><div class="notice">現場を開くと前年同現場・過去同現場へ飛べます。</div><div id="dailyArea" class="card">読み込み中...</div></section>
-<section id="yearlyScreen" class="hidden"><div class="notice">年ごとの売上合計・前年比・現場別・品目別を集計します。</div><div id="yearlyArea" class="card">読み込み中...</div></section>
+<section id="mainScreen" class="hidden">
+  <div class="tabs">
+    <button id="tabInput" class="tab active" onclick="showScreen('input')">入力</button>
+    <button id="tabDaily" class="tab" onclick="showScreen('daily')">日別</button>
+    <button id="tabYearly" class="tab" onclick="showScreen('yearly')">年間</button>
+  </div>
+
+  <section id="inputScreen">
+    <div class="card">
+      <label>日付</label>
+      <input type="date" id="date">
+
+      <label>現場名</label>
+      <input type="text" id="place" list="placeList" placeholder="例：茅ヶ崎">
+      <datalist id="placeList"></datalist>
+
+      <div id="recentItems" class="notice hidden"></div>
+
+      <div class="row">
+        <div>
+          <label>天気</label>
+          <input type="text" id="weather" placeholder="晴れ">
+        </div>
+        <div>
+          <label>風</label>
+          <select id="wind">
+            <option>なし</option>
+            <option>弱風</option>
+            <option>強風</option>
+          </select>
+        </div>
+      </div>
+
+      <label>品目</label>
+      <input type="text" id="item" list="itemList" placeholder="例：やきとり">
+      <datalist id="itemList"></datalist>
+      <div id="itemButtons" class="itemBtns"></div>
+
+      <div class="row">
+        <div>
+          <label>売上</label>
+          <input type="number" id="sales">
+        </div>
+        <div>
+          <label>本数</label>
+          <input type="number" id="count">
+        </div>
+      </div>
+
+      <label>担当</label>
+      <input type="text" id="staff">
+
+      <div class="row">
+        <div>
+          <label>経費</label>
+          <input type="number" id="cost">
+        </div>
+        <div>
+          <label>返し</label>
+          <input type="number" id="back">
+        </div>
+      </div>
+
+      <label>メモ</label>
+      <textarea id="memo"></textarea>
+
+      <button class="btn" onclick="saveData()">保存する</button>
+      <div class="status" id="result"></div>
+    </div>
+  </section>
+
+  <section id="dailyScreen" class="hidden">
+    <div class="card">
+      <div class="notice">日別は確認専用。最新が上、直近だけ開きます。</div>
+      <div id="dailyArea">読み込み中...</div>
+    </div>
+  </section>
+
+  <section id="yearlyScreen" class="hidden">
+    <div class="card">
+      <label>表示年</label>
+      <select id="yearSelect" onchange="renderYearly()"></select>
+      <div class="notice">年間は確認専用。1月から12月順、当月だけ開きます。</div>
+      <div id="yearlyArea">読み込み中...</div>
+    </div>
+  </section>
+</section>
+
 </div>
-<button class="saveBtn" onclick="saveData()">保存する</button>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyNENTFbFFYROwp0HesCHPM0T00AQUgBKxhK1UAywftqd6eXVBOvf2gn3P5sUpUkSvyQg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNHU8NG8B0Uq0_LcN4rpEi2-wqm-Y3LZpyxIeKQ-SIHGBFTjKGaKsvPOctGTFq4nFuMg/exec";
 const PIN = "2931";
-let allRows=[];let placeMasters=[];let loading=false;
-let selectedWeatherLocation="神奈川県横浜市";
 
-document.getElementById("pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")unlock();});
-if(localStorage.getItem("takotoraUnlocked")==="1") document.getElementById("lockScreen").style.display="none";
-document.getElementById("date").value=new Date().toISOString().slice(0,10);
-addItem();loadData();
+let allRows = [];
+let placeMasters = [];
+let itemMasters = [];
 
-function unlock(){const v=document.getElementById("pinInput").value.trim();if(v===PIN){localStorage.setItem("takotoraUnlocked","1");document.getElementById("lockScreen").style.display="none";}else{document.getElementById("pinErr").textContent="暗証番号が違います";}}
-function showTab(name,btn){document.getElementById("inputScreen").classList.toggle("hidden",name!=="input");document.getElementById("dailyScreen").classList.toggle("hidden",name!=="daily");document.getElementById("yearlyScreen").classList.toggle("hidden",name!=="yearly");document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));btn.classList.add("active");}
-function addItem(){const div=document.createElement("div");div.className="item";div.innerHTML=`<label>品目</label><input class="itemName" list="itemList" placeholder="例：たこ焼き"><label>売上</label><input class="itemAmount" type="number" value="0" oninput="calc()"><label>担当</label><input class="itemStaff" placeholder="担当名">`;document.getElementById("items").appendChild(div);}
-function calc(){let sum=0;document.querySelectorAll(".itemAmount").forEach(e=>sum+=Number(e.value||0));document.getElementById("total").textContent="合計："+sum.toLocaleString()+"円";const unit=Number(document.getElementById("expenseUnit").value||0);const count=Number(document.getElementById("expenseCount").value||0);document.getElementById("expenseTotal").textContent="経費："+(unit*count).toLocaleString()+"円";}
+document.getElementById("date").value = new Date().toISOString().slice(0,10);
+document.getElementById("pinInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") unlock();
+});
+document.getElementById("place").addEventListener("input", () => showRecentItems());
 
-function findPlaceMaster(name){const n=String(name||"").trim();return placeMasters.find(p=>p.place===n)||placeMasters.find(p=>n.includes(p.place)||p.place.includes(n));}
-function applyPlaceMaster(){
-  const place=document.getElementById("place").value.trim();
-  const m=findPlaceMaster(place);
-  if(m && m.location){
-    selectedWeatherLocation=m.location;
-    document.getElementById("placeWeatherLocation").textContent="天気場所："+m.location;
+if (localStorage.getItem("takotoraUnlock") === "1") showMain();
+
+function unlock(){
+  if(document.getElementById("pinInput").value.trim() === PIN){
+    localStorage.setItem("takotoraUnlock","1");
+    showMain();
   }else{
-    selectedWeatherLocation="神奈川県横浜市";
-    document.getElementById("placeWeatherLocation").textContent="天気場所：横浜（現場マスター未登録）";
+    alert("暗証番号が違います");
   }
 }
 
-async function autoWeather(){
- const box=document.getElementById("weatherBox");
- applyPlaceMaster();
- box.textContent="天気取得中...";
- const query=selectedWeatherLocation || "神奈川県横浜市";
- try{
- const geo=await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(query)+"&count=1&language=ja&format=json").then(r=>r.json());
- if(!geo.results||!geo.results.length)throw new Error("地点なし");
- const lat=geo.results[0].latitude,lon=geo.results[0].longitude;
- const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=Asia%2FTokyo`).then(r=>r.json());
- const c=w.current||{};const wt=weatherText(c.weather_code);const wind=Number(c.wind_speed_10m||0);
- document.getElementById("weather").value=wt.includes("雨")?"雨":(wt.includes("くもり")?"くもり":"晴れ");
- document.getElementById("wind").value=wind>=10?"強風":(wind>=5?"風あり":"");
- box.textContent=`${query}：${wt}　${c.temperature_2m??""}℃　風${wind}km/h`;
- }catch(e){tryFallbackYokohama();}
+function showMain(){
+  document.getElementById("lockScreen").style.display="none";
+  document.getElementById("mainScreen").classList.remove("hidden");
+  refreshAll();
 }
-async function tryFallbackYokohama(){try{const geo=await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent("神奈川県横浜市")+"&count=1&language=ja&format=json").then(r=>r.json());const lat=geo.results[0].latitude,lon=geo.results[0].longitude;const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=Asia%2FTokyo`).then(r=>r.json());const c=w.current||{};const wt=weatherText(c.weather_code);const wind=Number(c.wind_speed_10m||0);document.getElementById("weather").value=wt.includes("雨")?"雨":(wt.includes("くもり")?"くもり":"晴れ");document.getElementById("wind").value=wind>=10?"強風":(wind>=5?"風あり":"");document.getElementById("placeWeatherLocation").textContent="天気場所：横浜（自動 fallback）";document.getElementById("weatherBox").textContent=`神奈川県横浜市：${wt}　${c.temperature_2m??""}℃　風${wind}km/h`;}catch(e){document.getElementById("weatherBox").textContent="天気取得不可。手入力でOK。";}}
-function weatherText(code){code=Number(code);if([0,1].includes(code))return"晴れ";if([2,3,45,48].includes(code))return"くもり";if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code))return"雨";if([71,73,75,77,85,86].includes(code))return"雪";if([95,96,99].includes(code))return"雷雨";return"くもり";}
 
-function saveData(){
- const items=[];document.querySelectorAll(".item").forEach(row=>{const name=row.querySelector(".itemName").value.trim();if(name)items.push({name,amount:row.querySelector(".itemAmount").value,staff:row.querySelector(".itemStaff").value.trim()});});
- if(!document.getElementById("place").value.trim()){alert("現場名を入れてください");return;}
- if(items.length===0){alert("品目を入れてください");return;}
- const unit=Number(document.getElementById("expenseUnit").value||0);const count=Number(document.getElementById("expenseCount").value||0);
- const data={date:document.getElementById("date").value,place:document.getElementById("place").value.trim(),weatherLocation:selectedWeatherLocation,weather:document.getElementById("weather").value,wind:document.getElementById("wind").value,weatherMemo:document.getElementById("weatherBox").textContent,items,expenseUnit:unit,expenseCount:count,expenseTotal:unit*count,refund:document.getElementById("refund").value,memo:document.getElementById("memo").value};
- fetch(API_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(data)});
- localSave(data);alert("保存しました。スプレッドシートにも送信しました。");setTimeout(loadData,1000);
+function showScreen(name){
+  ["input","daily","yearly"].forEach(n=>{
+    document.getElementById(n+"Screen").classList.toggle("hidden", n !== name);
+    document.getElementById("tab"+cap(n)).classList.toggle("active", n === name);
+  });
+  if(name==="daily") renderDaily();
+  if(name==="yearly") renderYearly();
+  window.scrollTo({top:0,behavior:"smooth"});
 }
-function localSave(data){const rows=JSON.parse(localStorage.getItem("takotoraRows")||"[]");data.items.forEach(it=>rows.push({date:data.date,place:data.place,weatherLocation:data.weatherLocation,weather:data.weather,wind:data.wind,item:it.name,amount:Number(it.amount||0),staff:it.staff,memo:data.memo,weatherMemo:data.weatherMemo}));localStorage.setItem("takotoraRows",JSON.stringify(rows));}
-function loadData(){if(loading)return;loading=true;const cb="takotoraCallback_"+Date.now();window[cb]=function(res){loading=false;delete window[cb];allRows=(res&&res.rows)?res.rows:[];placeMasters=(res&&res.places)?res.places:[];if(allRows.length===0)allRows=JSON.parse(localStorage.getItem("takotoraRows")||"[]");buildPlaces();renderDaily();renderYearly();};const s=document.createElement("script");s.src=API_URL+"?action=list&callback="+cb+"&t="+Date.now();s.onerror=function(){loading=false;allRows=JSON.parse(localStorage.getItem("takotoraRows")||"[]");buildPlaces();renderDaily();renderYearly();};document.body.appendChild(s);setTimeout(()=>{try{s.remove();}catch(e){}},5000);}
-function buildPlaces(){const set=new Set(placeMasters.map(p=>p.place).filter(Boolean));allRows.map(r=>r.place).filter(Boolean).forEach(p=>set.add(p));document.getElementById("placeList").innerHTML=[...set].sort().map(p=>`<option value="${escapeHtml(p)}"></option>`).join("");}
-function groupDaily(){const groups={};allRows.forEach(r=>{const key=(r.date||"")+"｜"+(r.place||"");if(!groups[key])groups[key]={date:r.date,place:r.place,weather:r.weather,wind:r.wind,weatherMemo:r.weatherMemo,rows:[],total:0};groups[key].rows.push(r);groups[key].total+=Number(r.amount||0);});return Object.values(groups).sort((a,b)=>String(b.date).localeCompare(String(a.date)));}
-function nearestLastYear(g){const target=new Date(g.date);if(isNaN(target))return null;const lastYear=target.getFullYear()-1;const same=groupDaily().filter(x=>x.place===g.place&&String(x.date).startsWith(String(lastYear)));if(!same.length)return null;same.sort((a,b)=>Math.abs(new Date(a.date)-new Date(lastYear,target.getMonth(),target.getDate()))-Math.abs(new Date(b.date)-new Date(lastYear,target.getMonth(),target.getDate())));return same[0];}
-function renderDaily(){const area=document.getElementById("dailyArea");const list=groupDaily();if(!list.length){area.innerHTML="まだデータがありません";return;}area.innerHTML=list.map((g,i)=>{const prev=nearestLastYear(g);let comp="";if(prev){const diff=g.total-prev.total;const rate=prev.total?Math.round(g.total/prev.total*100):0;comp=`<div class="compare">前年同現場：${escapeHtml(prev.date)}　${prev.total.toLocaleString()}円<br>差額：${diff>=0?"+":""}${diff.toLocaleString()}円（${rate}%）<br><span class="jump" onclick="jumpPlace('${escapeAttr(g.place)}')">過去の${escapeHtml(g.place)}一覧</span></div>`;}else{comp=`<div class="compare">前年同現場データなし<br><span class="jump" onclick="jumpPlace('${escapeAttr(g.place)}')">過去の${escapeHtml(g.place)}一覧</span></div>`;}return `<div class="listCard" id="daily-${i}" data-place="${escapeAttr(g.place)}"><div class="placeTitle">${escapeHtml(g.place)} <span class="small">${escapeHtml(g.date)}</span></div><div class="small">${escapeHtml(g.weather||"")} ${escapeHtml(g.wind||"")} ${escapeHtml(g.weatherMemo||"")}</div><div class="money">合計：${g.total.toLocaleString()}円</div>${comp}<hr>${g.rows.map(r=>`<div>${escapeHtml(r.item)}　<b>${Number(r.amount||0).toLocaleString()}円</b>　<span class="small">${escapeHtml(r.staff||"")}</span></div>`).join("")}</div>`;}).join("");}
-function jumpPlace(place){const cards=[...document.querySelectorAll("[data-place]")].filter(el=>el.getAttribute("data-place")===place);if(cards[1])cards[1].scrollIntoView({behavior:"smooth",block:"start"});else if(cards[0])cards[0].scrollIntoView({behavior:"smooth",block:"start"});}
-function renderYearly(){const area=document.getElementById("yearlyArea");if(!allRows.length){area.innerHTML="まだデータがありません";return;}const years={};allRows.forEach(r=>{const y=String(r.date||"").slice(0,4)||"不明";if(!years[y])years[y]={total:0,places:{},items:{}};const amt=Number(r.amount||0);years[y].total+=amt;years[y].places[r.place]=(years[y].places[r.place]||0)+amt;years[y].items[r.item]=(years[y].items[r.item]||0)+amt;});area.innerHTML=Object.keys(years).sort((a,b)=>b.localeCompare(a)).map(y=>{const d=years[y];const prev=years[String(Number(y)-1)];const diff=prev?d.total-prev.total:null;const rate=prev&&prev.total?Math.round(d.total/prev.total*100):null;const p=Object.entries(d.places).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div>${escapeHtml(k)}：<b>${v.toLocaleString()}円</b></div>`).join("");const it=Object.entries(d.items).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="badge">${escapeHtml(k)} ${v.toLocaleString()}円</span>`).join("");return `<div class="listCard"><div class="placeTitle">${y}年</div><div class="money">年間売上：${d.total.toLocaleString()}円</div>${prev?`<div class="compare">前年比：${diff>=0?"+":""}${diff.toLocaleString()}円（${rate}%）</div>`:""}<hr><b>現場別</b>${p}<hr><b>品目別</b><br>${it}</div>`;}).join("");}
-function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
-function escapeAttr(s){return escapeHtml(s).replace(/`/g,"&#96;");}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+function jsonp(url){
+  return new Promise((resolve,reject)=>{
+    const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*9999);
+    window[cb] = data => {
+      delete window[cb];
+      script.remove();
+      resolve(data);
+    };
+    const script = document.createElement("script");
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+async function refreshAll(){
+  try{
+    const data = await jsonp(API_URL + "?action=list");
+    if(data && data.ok){
+      allRows = data.sales || [];
+      placeMasters = data.places || [];
+      itemMasters = data.items || [];
+      setupMasters();
+      setupYears();
+      renderDaily();
+      renderYearly();
+      showRecentItems();
+    }
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function setupMasters(){
+  document.getElementById("placeList").innerHTML =
+    placeMasters.map(p => `<option value="${escapeHtml(p["現場名"])}">`).join("");
+
+  document.getElementById("itemList").innerHTML =
+    itemMasters.map(i => `<option value="${escapeHtml(i["品目"])}">`).join("");
+
+  document.getElementById("itemButtons").innerHTML =
+    itemMasters.slice(0,10).map(i =>
+      `<button class="itemBtn" onclick="setItem('${escapeAttr(i["品目"])}')">${escapeHtml(i["品目"])}</button>`
+    ).join("");
+}
+
+function setItem(name){
+  document.getElementById("item").value = name;
+}
+
+function showRecentItems(){
+  const place = document.getElementById("place").value.trim();
+  const box = document.getElementById("recentItems");
+
+  if(!place){
+    box.classList.add("hidden");
+    return;
+  }
+
+  const rows = allRows
+    .filter(r => r.place === place)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+
+  if(!rows.length){
+    box.classList.add("hidden");
+    return;
+  }
+
+  const latestDate = rows[0].date;
+  const items = [...new Set(rows.filter(r => r.date === latestDate).map(r => r.item).filter(Boolean))];
+
+  if(!items.length){
+    box.classList.add("hidden");
+    return;
+  }
+
+  box.classList.remove("hidden");
+  box.innerHTML = "直近の品目候補<br>" +
+    items.map(i => `<button class="linkBtn" onclick="setItem('${escapeAttr(i)}')">${escapeHtml(i)}</button>`).join("");
+}
+
+async function saveData(){
+  const data = {
+    date: val("date"),
+    place: val("place"),
+    weatherLocation: "",
+    weather: val("weather"),
+    wind: val("wind"),
+    item: val("item"),
+    sales: Number(val("sales") || 0),
+    count: Number(val("count") || 0),
+    staff: val("staff"),
+    cost: Number(val("cost") || 0),
+    back: Number(val("back") || 0),
+    memo: val("memo")
+  };
+
+  document.getElementById("result").innerText = "保存中...";
+
+  try{
+    await fetch(API_URL, {
+      method:"POST",
+      mode:"no-cors",
+      body: JSON.stringify(data)
+    });
+
+    document.getElementById("result").innerText = "保存完了";
+    clearForm();
+    setTimeout(refreshAll, 900);
+  }catch(e){
+    document.getElementById("result").innerText = "保存失敗";
+  }
+}
+
+function clearForm(){
+  ["date","place","weather","item","sales","count","staff","cost","back","memo"].forEach(id=>{
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("wind").value = "なし";
+  document.getElementById("recentItems").classList.add("hidden");
+}
+
+function val(id){
+  return document.getElementById(id).value;
+}
+
+function setupYears(){
+  const y = document.getElementById("yearSelect");
+  const years = [...new Set(allRows.map(r => String(r.date).slice(0,4)).filter(Boolean))].sort().reverse();
+  const now = String(new Date().getFullYear());
+
+  if(!years.includes(now)) years.unshift(now);
+
+  y.innerHTML = years.map(v => `<option value="${v}">${v}年</option>`).join("");
+}
+
+function renderDaily(){
+  const area = document.getElementById("dailyArea");
+
+  if(!allRows.length){
+    area.innerHTML = "データなし";
+    return;
+  }
+
+  const groups = groupByDayPlace(allRows)
+    .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+
+  area.innerHTML = groups.map((g,i) => dayFold(g, i===0)).join("");
+}
+
+function dayFold(g, open){
+  return `
+    <details class="fold" ${open ? "open" : ""}>
+      <summary class="foldHead">${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${yen(g.total)}</summary>
+      <div class="foldBody">
+        ${g.rows.map(r => `
+          <div class="line">
+            <span>${escapeHtml(r.item)}　${escapeHtml(r.staff || "")}</span>
+            <b>${yen(r.sales)}</b>
+          </div>
+        `).join("")}
+        <hr>
+        <div class="line"><span>経費</span><b>${yen(g.cost)}</b></div>
+        <div class="line"><span>返し</span><b>${yen(g.back)}</b></div>
+      </div>
+    </details>`;
+}
+
+function renderYearly(){
+  const year = document.getElementById("yearSelect").value || String(new Date().getFullYear());
+  const rows = allRows.filter(r => String(r.date).startsWith(year));
+  const area = document.getElementById("yearlyArea");
+
+  const total = sum(rows,"sales");
+  const cost = sum(rows,"cost");
+
+  let html = `
+    <div class="summary">
+      ${year}年<br>
+      売上　${yen(total)}<br>
+      経費　${yen(cost)}
+    </div>
+  `;
+
+  for(let m=1; m<=12; m++){
+    const mm = String(m).padStart(2,"0");
+    const mr = rows.filter(r => String(r.date).slice(5,7) === mm);
+    if(!mr.length) continue;
+
+    const isCurrent = year === String(new Date().getFullYear()) && m === new Date().getMonth()+1;
+
+    html += `
+      <details class="fold" ${isCurrent ? "open" : ""}>
+        <summary class="foldHead">${m}月　${yen(sum(mr,"sales"))}</summary>
+        <div class="foldBody">
+          ${renderPlacesInMonth(mr)}
+        </div>
+      </details>
+    `;
+  }
+
+  area.innerHTML = html;
+}
+
+function renderPlacesInMonth(rows){
+  const by = {};
+
+  rows.forEach(r => {
+    const key = r.place || "未入力";
+    if(!by[key]) by[key] = [];
+    by[key].push(r);
+  });
+
+  return Object.keys(by).map(place => {
+    const pr = by[place];
+
+    return `
+      <details class="fold">
+        <summary class="foldHead">${escapeHtml(place)}　${yen(sum(pr,"sales"))}</summary>
+        <div class="foldBody">
+          ${groupByDayPlace(pr).map(g => dayFold(g,false)).join("")}
+        </div>
+      </details>
+    `;
+  }).join("");
+}
+
+function groupByDayPlace(rows){
+  const map = {};
+
+  rows.forEach(r => {
+    const key = r.date + "|" + r.place;
+
+    if(!map[key]){
+      map[key] = {
+        date: r.date,
+        place: r.place,
+        weather: r.weather,
+        rows: [],
+        total: 0,
+        cost: 0,
+        back: 0
+      };
+    }
+
+    map[key].rows.push(r);
+    map[key].total += Number(r.sales || 0);
+    map[key].cost += Number(r.cost || 0);
+    map[key].back += Number(r.back || 0);
+  });
+
+  return Object.values(map);
+}
+
+function sum(rows,key){
+  return rows.reduce((a,r) => a + Number(r[key] || 0), 0);
+}
+
+function yen(n){
+  return Number(n || 0).toLocaleString() + "円";
+}
+
+function weekday(date){
+  const d = new Date(date);
+  return ["日","月","火","水","木","金","土"][d.getDay()] || "";
+}
+
+function escapeHtml(s){
+  return String(s || "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function escapeAttr(s){
+  return String(s || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
 </script>
 </body>
 </html>
