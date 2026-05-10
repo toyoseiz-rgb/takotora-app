@@ -260,11 +260,7 @@ async function refreshAll(){
       placeMasters = data.places || [];
       itemMasters = data.items || [];
 
-      if(data.topItems && data.topItems.length){
-        topItems = data.topItems;
-      }else{
-        topItems = itemMasters.slice(0,10);
-      }
+      topItems = getSafeTopItems(data);
 
       setupMasters();
       setupYears();
@@ -275,6 +271,35 @@ async function refreshAll(){
   }catch(e){
     console.log(e);
   }
+}
+
+function getSafeTopItems(data){
+  let list = [];
+
+  if(data.topItems && data.topItems.length){
+    list = data.topItems;
+  }else if(data.items && data.items.length){
+    list = data.items;
+  }else{
+    list = itemMasters;
+  }
+
+  list = list.filter(i => getItemName(i));
+
+  if(!list.length){
+    return [];
+  }
+
+  const hasCount = list.some(i => Number(i["使用回数"] || i.count || 0) > 0);
+
+  if(hasCount){
+    list = list.sort((a,b) =>
+      Number(b["使用回数"] || b.count || 0) -
+      Number(a["使用回数"] || a.count || 0)
+    );
+  }
+
+  return list.slice(0,10);
 }
 
 function getItemName(obj){
@@ -288,11 +313,19 @@ function setupMasters(){
   document.getElementById("itemList").innerHTML =
     itemMasters.map(i => `<option value="${escapeHtml(getItemName(i))}">`).join("");
 
-  const buttons = topItems && topItems.length ? topItems : itemMasters.slice(0,10);
+  const buttons =
+    topItems && topItems.length
+      ? topItems
+      : itemMasters.slice(0,10);
 
   document.getElementById("itemButtons").innerHTML =
-    buttons.slice(0,10).map(i => {
+    buttons.map(i => {
       const name = getItemName(i);
+
+      if(!name){
+        return "";
+      }
+
       return `<button class="itemBtn" onclick="setItem('${escapeAttr(name)}')">${escapeHtml(name)}</button>`;
     }).join("");
 }
