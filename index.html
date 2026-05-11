@@ -83,23 +83,11 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <div class="row">
         <div>
           <label>天気</label>
-          <select id="weather">
-            <option value=""></option>
-            <option>晴</option>
-            <option>曇</option>
-            <option>雨</option>
-            <option>小雨</option>
-            <option>大雨</option>
-            <option>台風</option>
-          </select>
+         <input type="text" id="weather" placeholder="天気自動取得">
         </div>
         <div>
           <label>風</label>
-          <select id="wind">
-            <option value=""></option>
-            <option>風あり</option>
-            <option>強風</option>
-          </select>
+         <input type="text" id="wind" placeholder="風速自動取得">
         </div>
       </div>
 
@@ -402,8 +390,8 @@ async function getSimpleWeather(location, date){
   const windSpeed = data && data.daily && data.daily.wind_speed_10m_max ? Number(data.daily.wind_speed_10m_max[0] || 0) : 0;
 
   return {
-    weather: weatherFromCode(code),
-    wind: windFromSpeed(windSpeed)
+   weather: current.weathercode + "",
+wind: windSpeed + "m/s"
   };
 }
 
@@ -430,18 +418,7 @@ async function getGeo(location){
   return geoCache[key];
 }
 
-function weatherFromCode(code){
-  code = Number(code);
 
-  if(code === 0 || code === 1) return "晴";
-  if(code === 2 || code === 3) return "曇";
-  if(code === 45 || code === 48) return "曇";
-  if(code === 51 || code === 53 || code === 55 || code === 56 || code === 57) return "小雨";
-  if(code === 61 || code === 63 || code === 66 || code === 67 || code === 80 || code === 81) return "雨";
-  if(code === 65 || code === 82 || code === 95 || code === 96 || code === 99) return "大雨";
-  if(code === 71 || code === 73 || code === 75 || code === 77 || code === 85 || code === 86) return "雨";
-
-  return "";
 }
 
 function windFromSpeed(speed){
@@ -452,7 +429,7 @@ function windFromSpeed(speed){
 
 function updateCostPreview(){
   const cost = Number(val("cost") || 0);
-  const count = Number(val("count") || 0);
+  const count = Number(val("count") || 0)
   document.getElementById("costPreview").innerText =
     "経費 " + yen(cost) + " × " + count + "本 = " + yen(cost * count);
 }
