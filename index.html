@@ -26,7 +26,9 @@ input,select,textarea{width:100%;padding:15px;font-size:21px;border-radius:17px;
 textarea{height:82px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn{width:100%;padding:18px;border:none;border-radius:22px;background:var(--yellow);font-size:29px;font-weight:900;box-shadow:0 7px var(--gold);margin-top:18px}
-.btnMini{padding:11px 12px;border:none;border-radius:14px;background:var(--yellow);font-size:18px;font-weight:900;box-shadow:0 4px var(--gold);margin-top:10px}
+.btnSmall{padding:11px 10px;border:none;border-radius:14px;background:var(--yellow);font-size:17px;font-weight:900;box-shadow:0 4px var(--gold)}
+.topbar{display:flex;gap:8px;margin:8px 0 12px;position:sticky;top:72px;z-index:40}
+.topbar button{flex:1}
 .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
 .tab{background:#fff;border:none;border-radius:16px;padding:13px 6px;font-size:18px;font-weight:900;box-shadow:0 4px #aaa}
 .tab.active{background:var(--yellow);box-shadow:0 4px var(--gold)}
@@ -35,20 +37,14 @@ textarea{height:82px}
 .itemBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .itemBtn,.linkBtn{border:none;background:#111;color:#ffd000;border-radius:14px;padding:12px;font-size:17px;font-weight:900;margin:3px}
 .status{text-align:center;font-size:28px;font-weight:900;margin-top:14px}
-.addedBox{border:2px solid #eee;border-radius:16px;padding:10px;margin:12px 0;background:#fafafa}
-.addedRow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;border-bottom:1px solid #ddd;padding:8px 0;font-size:17px;font-weight:800}
-.addedRow:last-child{border-bottom:none}
-.delBtn{border:none;border-radius:10px;background:#111;color:#ffd000;font-weight:900;padding:8px 10px}
 .fold{background:#fff;border:2px solid #eee;border-radius:18px;padding:12px;margin:10px 0}
 .foldHead{font-size:18px;font-weight:900;cursor:pointer;list-style:none}
 .foldHead::-webkit-details-marker{display:none}
 .foldBody{margin-top:10px;border-top:1px solid #eee;padding-top:10px}
 .line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:16px}
-.leftLine{display:flex;align-items:center;gap:10px;min-width:0}
-.itemName{display:inline-block;min-width:82px;font-weight:800}
-.line b{font-size:18px;white-space:nowrap}
+.line b{font-size:18px}
 .summary{font-size:22px;font-weight:900;line-height:1.65;margin-bottom:12px}
-.expenseLine{font-size:16px;font-weight:900;padding-top:8px}
+.monthTitle{font-size:22px;font-weight:900;background:#111;color:#ffd000;border-radius:16px;padding:12px;margin:14px 0 8px}
 hr{border:none;border-top:1px solid #eee;margin:10px 0}
 </style>
 </head>
@@ -67,7 +63,6 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
 </section>
 
 <section id="mainScreen" class="hidden">
-
   <div class="tabs">
     <button id="tabInput" class="tab active" onclick="showScreen('input')">入力</button>
     <button id="tabDaily" class="tab" onclick="showScreen('daily')">日別</button>
@@ -76,12 +71,11 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
 
   <section id="inputScreen">
     <div class="card">
-
       <label>日付</label>
       <input type="date" id="date">
 
       <label>現場名</label>
-      <input type="text" id="place" list="placeList" placeholder="例：浅間">
+      <input type="text" id="place" list="placeList" placeholder="現場名を入力">
       <datalist id="placeList"></datalist>
 
       <div id="recentItems" class="notice hidden"></div>
@@ -89,18 +83,29 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <div class="row">
         <div>
           <label>天気</label>
-          <input type="text" id="weather" readonly>
+          <select id="weather">
+            <option value=""></option>
+            <option>晴</option>
+            <option>曇</option>
+            <option>雨</option>
+            <option>小雨</option>
+            <option>大雨</option>
+            <option>台風</option>
+          </select>
         </div>
         <div>
           <label>風</label>
-          <input type="text" id="wind" readonly>
+          <select id="wind">
+            <option value=""></option>
+            <option>風あり</option>
+            <option>強風</option>
+          </select>
         </div>
       </div>
 
       <label>品目</label>
       <input type="text" id="item" list="itemList" placeholder="例：やきとり">
       <datalist id="itemList"></datalist>
-
       <div id="itemButtons" class="itemBtns"></div>
 
       <div class="row">
@@ -109,35 +114,30 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
           <input type="number" id="sales">
         </div>
         <div>
-          <label>担当</label>
-          <input type="text" id="staff">
-        </div>
-      </div>
-
-      <button class="btnMini" onclick="addItem()">品目を追加</button>
-
-      <div id="addedItems" class="addedBox hidden"></div>
-
-      <div class="row">
-        <div>
-          <label>経費単価</label>
-          <input type="number" id="costUnit">
-        </div>
-        <div>
           <label>本数</label>
           <input type="number" id="count">
         </div>
       </div>
 
-      <label>返し</label>
-      <input type="number" id="back">
+      <label>担当</label>
+      <input type="text" id="staff">
+
+      <div class="row">
+        <div>
+          <label>経費</label>
+          <input type="number" id="cost">
+        </div>
+        <div>
+          <label>返し</label>
+          <input type="number" id="back">
+        </div>
+      </div>
 
       <label>メモ</label>
       <textarea id="memo"></textarea>
 
       <button class="btn" onclick="saveData()">保存する</button>
       <div class="status" id="result"></div>
-
     </div>
   </section>
 
@@ -156,7 +156,6 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       <div id="yearlyArea">読み込み中...</div>
     </div>
   </section>
-
 </section>
 
 </div>
@@ -168,27 +167,22 @@ const PIN = "2931";
 let allRows = [];
 let placeMasters = [];
 let itemMasters = [];
-let topItems = [];
-let entryItems = [];
+let weatherTimer = null;
+let geoCache = {};
 
 document.getElementById("date").value = new Date().toISOString().slice(0,10);
-
 document.getElementById("pinInput").addEventListener("keydown", e => {
-  if(e.key === "Enter") unlock();
+  if (e.key === "Enter") unlock();
 });
-
 document.getElementById("place").addEventListener("input", () => {
   showRecentItems();
+  scheduleWeatherAutoFill();
+});
+document.getElementById("date").addEventListener("change", () => {
+  scheduleWeatherAutoFill();
 });
 
-document.getElementById("place").addEventListener("change", () => {
-  showRecentItems();
-  updateWeather();
-});
-
-if(localStorage.getItem("takotoraUnlock") === "1"){
-  showMain();
-}
+if (localStorage.getItem("takotoraUnlock") === "1") showMain();
 
 function unlock(){
   if(document.getElementById("pinInput").value.trim() === PIN){
@@ -200,37 +194,31 @@ function unlock(){
 }
 
 function showMain(){
-  document.getElementById("lockScreen").style.display = "none";
+  document.getElementById("lockScreen").style.display="none";
   document.getElementById("mainScreen").classList.remove("hidden");
   refreshAll();
 }
 
 function showScreen(name){
-  ["input","daily","yearly"].forEach(n => {
+  ["input","daily","yearly"].forEach(n=>{
     document.getElementById(n+"Screen").classList.toggle("hidden", n !== name);
     document.getElementById("tab"+cap(n)).classList.toggle("active", n === name);
   });
-
-  if(name === "daily") renderDaily();
-  if(name === "yearly") renderYearly();
-
+  if(name==="daily") renderDaily();
+  if(name==="yearly") renderYearly();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function cap(s){
-  return s.charAt(0).toUpperCase()+s.slice(1);
-}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 
 function jsonp(url){
-  return new Promise((resolve,reject) => {
+  return new Promise((resolve,reject)=>{
     const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*9999);
-
     window[cb] = data => {
       delete window[cb];
       script.remove();
       resolve(data);
     };
-
     const script = document.createElement("script");
     script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
     script.onerror = reject;
@@ -241,18 +229,16 @@ function jsonp(url){
 async function refreshAll(){
   try{
     const data = await jsonp(API_URL + "?action=list");
-
     if(data && data.ok){
       allRows = data.sales || [];
       placeMasters = data.places || [];
       itemMasters = data.items || [];
-      topItems = data.topItems || itemMasters.slice(0,10);
-
       setupMasters();
       setupYears();
       renderDaily();
       renderYearly();
       showRecentItems();
+      scheduleWeatherAutoFill();
     }
   }catch(e){
     console.log(e);
@@ -267,61 +253,13 @@ function setupMasters(){
     itemMasters.map(i => `<option value="${escapeHtml(i["品目"])}">`).join("");
 
   document.getElementById("itemButtons").innerHTML =
-    topItems.slice(0,10).map(i =>
+    itemMasters.slice(0,10).map(i =>
       `<button class="itemBtn" onclick="setItem('${escapeAttr(i["品目"])}')">${escapeHtml(i["品目"])}</button>`
     ).join("");
 }
 
 function setItem(name){
   document.getElementById("item").value = name;
-}
-
-function addItem(){
-  const name = val("item").trim();
-  const sales = Number(val("sales") || 0);
-  const staff = val("staff").trim();
-
-  if(!name){
-    alert("品目を入れてください");
-    return;
-  }
-
-  entryItems.push({
-    name: name,
-    sales: sales,
-    staff: staff
-  });
-
-  document.getElementById("item").value = "";
-  document.getElementById("sales").value = "";
-  document.getElementById("staff").value = "";
-
-  renderEntryItems();
-}
-
-function renderEntryItems(){
-  const box = document.getElementById("addedItems");
-
-  if(!entryItems.length){
-    box.classList.add("hidden");
-    box.innerHTML = "";
-    return;
-  }
-
-  box.classList.remove("hidden");
-
-  box.innerHTML = entryItems.map((it,i) => `
-    <div class="addedRow">
-      <div>${escapeHtml(it.name)}　${escapeHtml(it.staff || "")}</div>
-      <b>${yen(it.sales)}</b>
-      <button class="delBtn" onclick="removeItem(${i})">削除</button>
-    </div>
-  `).join("");
-}
-
-function removeItem(i){
-  entryItems.splice(i,1);
-  renderEntryItems();
 }
 
 function showRecentItems(){
@@ -343,13 +281,7 @@ function showRecentItems(){
   }
 
   const latestDate = rows[0].date;
-
-  const items = [...new Set(
-    rows
-      .filter(r => r.date === latestDate)
-      .map(r => r.item)
-      .filter(Boolean)
-  )];
+  const items = [...new Set(rows.filter(r => r.date === latestDate).map(r => r.item).filter(Boolean))];
 
   if(!items.length){
     box.classList.add("hidden");
@@ -361,79 +293,128 @@ function showRecentItems(){
     items.map(i => `<button class="linkBtn" onclick="setItem('${escapeAttr(i)}')">${escapeHtml(i)}</button>`).join("");
 }
 
-function getWeatherLocation(){
-  const place = val("place").trim();
+function getWeatherLocationByPlace(place){
+  const name = String(place || "").trim();
+  if(!name) return "";
 
-  const master = placeMasters.find(p => p["現場名"] === place);
+  const hit = placeMasters.find(p => String(p["現場名"] || "").trim() === name);
+  if(!hit) return "";
 
-  return master ? String(master["天気場所"] || place) : place;
+  return String(hit["天気場所"] || "").trim();
 }
 
-async function updateWeather(){
-  const location = getWeatherLocation();
+function scheduleWeatherAutoFill(){
+  clearTimeout(weatherTimer);
+  weatherTimer = setTimeout(fetchWeatherByInput, 500);
+}
 
-  if(!location) return;
+async function fetchWeatherByInput(){
+  const date = val("date");
+  const place = val("place");
+  const weatherLocation = getWeatherLocationByPlace(place);
+
+  if(!date || !place || !weatherLocation) return;
 
   try{
-    const res = await fetch("https://wttr.in/" + encodeURIComponent(location) + "?format=j1");
-    const data = await res.json();
+    const result = await getSimpleWeather(weatherLocation, date);
+    if(!result) return;
 
-    const current = data.current_condition[0];
-    const text = current.weatherDesc[0].value;
-    const windKmph = Number(current.windspeedKmph || 0);
-
-    document.getElementById("weather").value = normalizeWeather(text);
-    document.getElementById("wind").value = normalizeWind(windKmph);
-
+    document.getElementById("weather").value = result.weather || "";
+    document.getElementById("wind").value = result.wind || "";
   }catch(e){
     console.log(e);
   }
 }
 
-function normalizeWeather(text){
-  const t = String(text || "");
+async function getSimpleWeather(location, date){
+  const geo = await getGeo(location);
+  if(!geo) return null;
 
-  if(t.includes("typhoon") || t.includes("storm") || t.includes("雷")) return "台風";
-  if(t.includes("Heavy") || t.includes("大雨")) return "大雨";
-  if(t.includes("Light") || t.includes("小雨")) return "小雨";
-  if(t.includes("rain") || t.includes("Rain") || t.includes("雨")) return "雨";
-  if(t.includes("cloud") || t.includes("Cloud") || t.includes("Overcast") || t.includes("曇")) return "曇";
+  const today = new Date().toISOString().slice(0,10);
+  const base = date < today
+    ? "https://archive-api.open-meteo.com/v1/archive"
+    : "https://api.open-meteo.com/v1/forecast";
 
-  return "晴";
+  const url =
+    base +
+    "?latitude=" + encodeURIComponent(geo.latitude) +
+    "&longitude=" + encodeURIComponent(geo.longitude) +
+    "&start_date=" + encodeURIComponent(date) +
+    "&end_date=" + encodeURIComponent(date) +
+    "&daily=weather_code,wind_speed_10m_max" +
+    "&timezone=Asia%2FTokyo";
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const code = data && data.daily && data.daily.weather_code ? data.daily.weather_code[0] : null;
+  const windSpeed = data && data.daily && data.daily.wind_speed_10m_max ? Number(data.daily.wind_speed_10m_max[0] || 0) : 0;
+
+  return {
+    weather: weatherFromCode(code),
+    wind: windFromSpeed(windSpeed)
+  };
 }
 
-function normalizeWind(kmph){
-  const n = Number(kmph || 0);
+async function getGeo(location){
+  const key = String(location || "").trim();
+  if(!key) return null;
+  if(geoCache[key]) return geoCache[key];
 
-  if(n >= 15) return "強風";
-  if(n >= 5) return "風あり";
+  const url =
+    "https://geocoding-api.open-meteo.com/v1/search" +
+    "?name=" + encodeURIComponent(key) +
+    "&count=1&language=ja&format=json";
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if(!data || !data.results || !data.results.length) return null;
+
+  geoCache[key] = {
+    latitude: data.results[0].latitude,
+    longitude: data.results[0].longitude
+  };
+
+  return geoCache[key];
+}
+
+function weatherFromCode(code){
+  code = Number(code);
+
+  if(code === 0 || code === 1) return "晴";
+  if(code === 2 || code === 3) return "曇";
+  if(code === 45 || code === 48) return "曇";
+
+  if(code === 51 || code === 53 || code === 55 || code === 56 || code === 57) return "小雨";
+
+  if(code === 61 || code === 63 || code === 66 || code === 67 || code === 80 || code === 81) return "雨";
+
+  if(code === 65 || code === 82 || code === 95 || code === 96 || code === 99) return "大雨";
+
+  if(code === 71 || code === 73 || code === 75 || code === 77 || code === 85 || code === 86) return "雨";
 
   return "";
 }
 
+function windFromSpeed(speed){
+  if(speed >= 10) return "強風";
+  if(speed >= 5) return "風あり";
+  return "";
+}
+
 async function saveData(){
-  if(!entryItems.length){
-    addItem();
-  }
-
-  if(!entryItems.length){
-    return;
-  }
-
-  const costUnit = Number(val("costUnit") || 0);
-  const count = Number(val("count") || 0);
-  const costTotal = costUnit * count;
-
   const data = {
     date: val("date"),
     place: val("place"),
-    weatherLocation: getWeatherLocation(),
+    weatherLocation: getWeatherLocationByPlace(val("place")),
     weather: val("weather"),
     wind: val("wind"),
-    items: entryItems,
-    costUnit: costUnit,
-    count: count,
-    costTotal: costTotal,
+    item: val("item"),
+    sales: Number(val("sales") || 0),
+    count: Number(val("count") || 0),
+    staff: val("staff"),
+    cost: Number(val("cost") || 0),
     back: Number(val("back") || 0),
     memo: val("memo")
   };
@@ -448,38 +429,18 @@ async function saveData(){
     });
 
     document.getElementById("result").innerText = "保存完了";
-
     clearForm();
-
-    setTimeout(refreshAll,900);
-
+    setTimeout(refreshAll, 900);
   }catch(e){
     document.getElementById("result").innerText = "保存失敗";
   }
 }
 
 function clearForm(){
-  [
-    "date",
-    "place",
-    "weather",
-    "wind",
-    "item",
-    "sales",
-    "staff",
-    "costUnit",
-    "count",
-    "back",
-    "memo"
-  ].forEach(id => {
+  ["date","place","weather","item","sales","count","staff","cost","back","memo"].forEach(id=>{
     document.getElementById(id).value = "";
   });
-
-  document.getElementById("date").value = new Date().toISOString().slice(0,10);
-
-  entryItems = [];
-  renderEntryItems();
-
+  document.getElementById("wind").value = "";
   document.getElementById("recentItems").classList.add("hidden");
 }
 
@@ -489,11 +450,7 @@ function val(id){
 
 function setupYears(){
   const y = document.getElementById("yearSelect");
-
-  const years = [...new Set(
-    allRows.map(r => String(r.date).slice(0,4)).filter(Boolean)
-  )].sort().reverse();
-
+  const years = [...new Set(allRows.map(r => String(r.date).slice(0,4)).filter(Boolean))].sort().reverse();
   const now = String(new Date().getFullYear());
 
   if(!years.includes(now)) years.unshift(now);
@@ -518,29 +475,19 @@ function renderDaily(){
 function dayFold(g, open){
   return `
     <details class="fold" ${open ? "open" : ""}>
-      <summary class="foldHead">
-        ${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${escapeHtml(g.wind)} ${yen(g.total)}
-      </summary>
-
+      <summary class="foldHead">${g.date}（${weekday(g.date)}） ${escapeHtml(g.place)} ${escapeHtml(g.weather)} ${yen(g.total)}</summary>
       <div class="foldBody">
         ${g.rows.map(r => `
           <div class="line">
-            <div class="leftLine">
-              <span class="itemName">${escapeHtml(r.item)}</span>
-              <span>${escapeHtml(r.staff || "")}</span>
-            </div>
+            <span>${escapeHtml(r.item)}　${escapeHtml(r.staff || "")}</span>
             <b>${yen(r.sales)}</b>
           </div>
         `).join("")}
-
         <hr>
-
-        <div class="expenseLine">
-          経費 ${yen(g.costUnit)} ${g.count}本 ${yen(g.costTotal)}　返し ${yen(g.back)}
-        </div>
+        <div class="line"><span>経費</span><b>${yen(g.cost)}</b></div>
+        <div class="line"><span>返し</span><b>${yen(g.back)}</b></div>
       </div>
-    </details>
-  `;
+    </details>`;
 }
 
 function renderYearly(){
@@ -549,29 +496,26 @@ function renderYearly(){
   const area = document.getElementById("yearlyArea");
 
   const total = sum(rows,"sales");
-  const cost = sum(rows,"costTotal");
+  const cost = sum(rows,"cost");
 
   let html = `
     <div class="summary">
       ${year}年<br>
-      売上 ${yen(total)}<br>
-      経費 ${yen(cost)}
+      売上　${yen(total)}<br>
+      経費　${yen(cost)}
     </div>
   `;
 
   for(let m=1; m<=12; m++){
     const mm = String(m).padStart(2,"0");
     const mr = rows.filter(r => String(r.date).slice(5,7) === mm);
-
     if(!mr.length) continue;
 
-    const isCurrent =
-      year === String(new Date().getFullYear()) &&
-      m === new Date().getMonth()+1;
+    const isCurrent = year === String(new Date().getFullYear()) && m === new Date().getMonth()+1;
 
     html += `
       <details class="fold" ${isCurrent ? "open" : ""}>
-        <summary class="foldHead">${m}月 ${yen(sum(mr,"sales"))}</summary>
+        <summary class="foldHead">${m}月　${yen(sum(mr,"sales"))}</summary>
         <div class="foldBody">
           ${renderPlacesInMonth(mr)}
         </div>
@@ -596,7 +540,7 @@ function renderPlacesInMonth(rows){
 
     return `
       <details class="fold">
-        <summary class="foldHead">${escapeHtml(place)} ${yen(sum(pr,"sales"))}</summary>
+        <summary class="foldHead">${escapeHtml(place)}　${yen(sum(pr,"sales"))}</summary>
         <div class="foldBody">
           ${groupByDayPlace(pr).map(g => dayFold(g,false)).join("")}
         </div>
@@ -616,18 +560,17 @@ function groupByDayPlace(rows){
         date: r.date,
         place: r.place,
         weather: r.weather,
-        wind: r.wind,
         rows: [],
         total: 0,
-        costUnit: Number(r.costUnit || 0),
-        count: Number(r.count || 0),
-        costTotal: Number(r.costTotal || 0),
-        back: Number(r.back || 0)
+        cost: 0,
+        back: 0
       };
     }
 
     map[key].rows.push(r);
     map[key].total += Number(r.sales || 0);
+    map[key].cost += Number(r.cost || 0);
+    map[key].back += Number(r.back || 0);
   });
 
   return Object.values(map);
