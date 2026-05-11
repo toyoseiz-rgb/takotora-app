@@ -419,13 +419,8 @@ async function getGeo(location){
 }
 
 
-}
 
-function windFromSpeed(speed){
-  if(speed >= 10) return "強風";
-  if(speed >= 5) return "風あり";
-  return "";
-}
+
 
 function updateCostPreview(){
   const cost = Number(val("cost") || 0);
