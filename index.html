@@ -27,8 +27,6 @@ textarea{height:82px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn{width:100%;padding:18px;border:none;border-radius:22px;background:var(--yellow);font-size:29px;font-weight:900;box-shadow:0 7px var(--gold);margin-top:18px}
 .btnSmall{padding:11px 10px;border:none;border-radius:14px;background:var(--yellow);font-size:17px;font-weight:900;box-shadow:0 4px var(--gold)}
-.topbar{display:flex;gap:8px;margin:8px 0 12px;position:sticky;top:72px;z-index:40}
-.topbar button{flex:1}
 .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
 .tab{background:#fff;border:none;border-radius:16px;padding:13px 6px;font-size:18px;font-weight:900;box-shadow:0 4px #aaa}
 .tab.active{background:var(--yellow);box-shadow:0 4px var(--gold)}
@@ -36,6 +34,9 @@ textarea{height:82px}
 .notice{font-size:15px;background:#fff7c7;border:2px solid #ffd000;border-radius:14px;padding:10px;margin:10px 0;font-weight:900}
 .itemBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .itemBtn,.linkBtn{border:none;background:#111;color:#ffd000;border-radius:14px;padding:12px;font-size:17px;font-weight:900;margin:3px}
+.itemBox{border:3px solid #111;border-radius:18px;padding:12px;margin:12px 0;background:#fff}
+.itemHead{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:18px;margin-bottom:8px}
+.delBtn{border:none;background:#ddd;border-radius:12px;padding:8px 12px;font-size:15px;font-weight:900}
 .status{text-align:center;font-size:28px;font-weight:900;margin-top:14px}
 .fold{background:#fff;border:2px solid #eee;border-radius:18px;padding:12px;margin:10px 0}
 .foldHead{font-size:18px;font-weight:900;cursor:pointer;list-style:none}
@@ -44,7 +45,6 @@ textarea{height:82px}
 .line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:16px}
 .line b{font-size:18px}
 .summary{font-size:22px;font-weight:900;line-height:1.65;margin-bottom:12px}
-.monthTitle{font-size:22px;font-weight:900;background:#111;color:#ffd000;border-radius:16px;padding:12px;margin:14px 0 8px}
 hr{border:none;border-top:1px solid #eee;margin:10px 0}
 </style>
 </head>
@@ -104,34 +104,26 @@ hr{border:none;border-top:1px solid #eee;margin:10px 0}
       </div>
 
       <label>品目</label>
-      <input type="text" id="item" list="itemList" placeholder="例：やきとり">
       <datalist id="itemList"></datalist>
       <div id="itemButtons" class="itemBtns"></div>
+      <div id="itemsArea"></div>
+      <button class="btnSmall" onclick="addItemRow()">＋ 品目追加</button>
 
       <div class="row">
         <div>
-          <label>売上</label>
-          <input type="number" id="sales">
+          <label>経費単価</label>
+          <input type="number" id="cost" oninput="updateCostPreview()">
         </div>
         <div>
           <label>本数</label>
-          <input type="number" id="count">
+          <input type="number" id="count" oninput="updateCostPreview()">
         </div>
       </div>
 
-      <label>担当</label>
-      <input type="text" id="staff">
+      <div class="notice" id="costPreview">経費 0円 × 0本 = 0円</div>
 
-      <div class="row">
-        <div>
-          <label>経費</label>
-          <input type="number" id="cost">
-        </div>
-        <div>
-          <label>返し</label>
-          <input type="number" id="back">
-        </div>
-      </div>
+      <label>返し</label>
+      <input type="number" id="back">
 
       <label>メモ</label>
       <textarea id="memo"></textarea>
@@ -170,7 +162,7 @@ let itemMasters = [];
 let weatherTimer = null;
 let geoCache = {};
 
-document.getElementById("date").value = new Date().toISOString().slice(0,10);
+document.getElementById("date").value = localDate();
 document.getElementById("pinInput").addEventListener("keydown", e => {
   if (e.key === "Enter") unlock();
 });
@@ -183,6 +175,7 @@ document.getElementById("date").addEventListener("change", () => {
 });
 
 if (localStorage.getItem("takotoraUnlock") === "1") showMain();
+addItemRow();
 
 function unlock(){
   if(document.getElementById("pinInput").value.trim() === PIN){
@@ -258,8 +251,66 @@ function setupMasters(){
     ).join("");
 }
 
+function addItemRow(name){
+  const area = document.getElementById("itemsArea");
+  const no = area.querySelectorAll(".itemBox").length + 1;
+
+  const box = document.createElement("div");
+  box.className = "itemBox";
+  box.innerHTML = `
+    <div class="itemHead">
+      <span>品目 ${no}</span>
+      <button type="button" class="delBtn" onclick="removeItemRow(this)">削除</button>
+    </div>
+    <label>品目名</label>
+    <input type="text" class="itemName" list="itemList" placeholder="例：やきとり" value="${escapeHtml(name || "")}">
+    <label>売上</label>
+    <input type="number" class="itemSales">
+    <label>担当</label>
+    <input type="text" class="itemStaff">
+  `;
+
+  area.appendChild(box);
+  renumberItems();
+}
+
+function removeItemRow(btn){
+  const area = document.getElementById("itemsArea");
+  if(area.querySelectorAll(".itemBox").length <= 1){
+    const box = btn.closest(".itemBox");
+    box.querySelector(".itemName").value = "";
+    box.querySelector(".itemSales").value = "";
+    box.querySelector(".itemStaff").value = "";
+    return;
+  }
+  btn.closest(".itemBox").remove();
+  renumberItems();
+}
+
+function renumberItems(){
+  document.querySelectorAll(".itemBox").forEach((box,i)=>{
+    box.querySelector(".itemHead span").innerText = "品目 " + (i+1);
+  });
+}
+
 function setItem(name){
-  document.getElementById("item").value = name;
+  const rows = [...document.querySelectorAll(".itemBox")];
+  let target = rows.find(box => !box.querySelector(".itemName").value.trim());
+
+  if(!target){
+    addItemRow(name);
+    return;
+  }
+
+  target.querySelector(".itemName").value = name;
+}
+
+function getInputItems(){
+  return [...document.querySelectorAll(".itemBox")].map(box => ({
+    name: box.querySelector(".itemName").value.trim(),
+    sales: Number(box.querySelector(".itemSales").value || 0),
+    staff: box.querySelector(".itemStaff").value.trim()
+  })).filter(i => i.name || i.sales || i.staff);
 }
 
 function showRecentItems(){
@@ -330,7 +381,7 @@ async function getSimpleWeather(location, date){
   const geo = await getGeo(location);
   if(!geo) return null;
 
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDate();
   const base = date < today
     ? "https://archive-api.open-meteo.com/v1/archive"
     : "https://api.open-meteo.com/v1/forecast";
@@ -385,13 +436,9 @@ function weatherFromCode(code){
   if(code === 0 || code === 1) return "晴";
   if(code === 2 || code === 3) return "曇";
   if(code === 45 || code === 48) return "曇";
-
   if(code === 51 || code === 53 || code === 55 || code === 56 || code === 57) return "小雨";
-
   if(code === 61 || code === 63 || code === 66 || code === 67 || code === 80 || code === 81) return "雨";
-
   if(code === 65 || code === 82 || code === 95 || code === 96 || code === 99) return "大雨";
-
   if(code === 71 || code === 73 || code === 75 || code === 77 || code === 85 || code === 86) return "雨";
 
   return "";
@@ -403,18 +450,30 @@ function windFromSpeed(speed){
   return "";
 }
 
+function updateCostPreview(){
+  const cost = Number(val("cost") || 0);
+  const count = Number(val("count") || 0);
+  document.getElementById("costPreview").innerText =
+    "経費 " + yen(cost) + " × " + count + "本 = " + yen(cost * count);
+}
+
 async function saveData(){
+  const items = getInputItems();
+
+  if(!items.length){
+    alert("品目を1つ以上入力してください");
+    return;
+  }
+
   const data = {
     date: val("date"),
     place: val("place"),
     weatherLocation: getWeatherLocationByPlace(val("place")),
     weather: val("weather"),
     wind: val("wind"),
-    item: val("item"),
-    sales: Number(val("sales") || 0),
+    items: items,
+    costUnit: Number(val("cost") || 0),
     count: Number(val("count") || 0),
-    staff: val("staff"),
-    cost: Number(val("cost") || 0),
     back: Number(val("back") || 0),
     memo: val("memo")
   };
@@ -437,11 +496,16 @@ async function saveData(){
 }
 
 function clearForm(){
-  ["date","place","weather","item","sales","count","staff","cost","back","memo"].forEach(id=>{
+  ["place","weather","cost","count","back","memo"].forEach(id=>{
     document.getElementById(id).value = "";
   });
+
+  document.getElementById("date").value = localDate();
   document.getElementById("wind").value = "";
   document.getElementById("recentItems").classList.add("hidden");
+  document.getElementById("itemsArea").innerHTML = "";
+  addItemRow();
+  updateCostPreview();
 }
 
 function val(id){
@@ -484,8 +548,8 @@ function dayFold(g, open){
           </div>
         `).join("")}
         <hr>
-        <div class="line"><span>経費</span><b>${yen(g.cost)}</b></div>
-        <div class="line"><span>返し</span><b>${yen(g.back)}</b></div>
+        <div class="line"><span>売上</span><b>${yen(g.total)}</b></div>
+        <div class="line"><span>経費 ${yen(g.cost)} × ${g.count}本 = ${yen(g.costTotal)}　返し ${yen(g.back)}</span><b></b></div>
       </div>
     </details>`;
 }
@@ -495,14 +559,16 @@ function renderYearly(){
   const rows = allRows.filter(r => String(r.date).startsWith(year));
   const area = document.getElementById("yearlyArea");
 
+  const groups = groupByDayPlace(rows);
   const total = sum(rows,"sales");
-  const cost = sum(rows,"cost");
+  const costTotal = groups.reduce((a,g) => a + Number(g.costTotal || 0), 0);
+  const backTotal = groups.reduce((a,g) => a + Number(g.back || 0), 0);
 
   let html = `
     <div class="summary">
       ${year}年<br>
       売上　${yen(total)}<br>
-      経費　${yen(cost)}
+      経費　${yen(costTotal)}　返し　${yen(backTotal)}
     </div>
   `;
 
@@ -511,12 +577,16 @@ function renderYearly(){
     const mr = rows.filter(r => String(r.date).slice(5,7) === mm);
     if(!mr.length) continue;
 
+    const mg = groupByDayPlace(mr);
+    const monthCost = mg.reduce((a,g) => a + Number(g.costTotal || 0), 0);
+    const monthBack = mg.reduce((a,g) => a + Number(g.back || 0), 0);
     const isCurrent = year === String(new Date().getFullYear()) && m === new Date().getMonth()+1;
 
     html += `
       <details class="fold" ${isCurrent ? "open" : ""}>
         <summary class="foldHead">${m}月　${yen(sum(mr,"sales"))}</summary>
         <div class="foldBody">
+          <div class="line"><span>経費 ${yen(monthCost)}　返し ${yen(monthBack)}</span><b></b></div>
           ${renderPlacesInMonth(mr)}
         </div>
       </details>
@@ -556,24 +626,34 @@ function groupByDayPlace(rows){
     const key = r.date + "|" + r.place;
 
     if(!map[key]){
+      const cost = getCostUnit(r);
+      const count = Number(r.count || 0);
+      const back = Number(r.back || 0);
+
       map[key] = {
         date: r.date,
         place: r.place,
         weather: r.weather,
         rows: [],
         total: 0,
-        cost: 0,
-        back: 0
+        cost: cost,
+        count: count,
+        costTotal: cost * count,
+        back: back
       };
     }
 
     map[key].rows.push(r);
     map[key].total += Number(r.sales || 0);
-    map[key].cost += Number(r.cost || 0);
-    map[key].back += Number(r.back || 0);
   });
 
   return Object.values(map);
+}
+
+function getCostUnit(r){
+  if(r.costUnit !== undefined) return Number(r.costUnit || 0);
+  if(r.cost !== undefined) return Number(r.cost || 0);
+  return 0;
 }
 
 function sum(rows,key){
@@ -587,6 +667,12 @@ function yen(n){
 function weekday(date){
   const d = new Date(date);
   return ["日","月","火","水","木","金","土"][d.getDay()] || "";
+}
+
+function localDate(){
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0,10);
 }
 
 function escapeHtml(s){
